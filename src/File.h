@@ -7,15 +7,21 @@
 #include <string>
 #include <vector>
 
-class File
-{
-public:
-    explicit File(const std::string& filePath);
-    std::string                 GetContents() const;
+class File {
+   public:
+    enum class FileType {
+        Model,
+        Shader
+    };
+   public:
+    explicit File(const std::string& fileName, const FileType fileType);
+    std::string GetContents() const;
     const std::filesystem::path GetFilePath() const;
-    std::vector<std::string>    GetDirectoryContents() const;
+    std::vector<std::string> GetDirectoryContents() const;
+    std::string GetFileName() const;
+    std::string GetFileEnding() const;
 
-private:
+   private:
     const std::filesystem::path inputPath;
 };
 

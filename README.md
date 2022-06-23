@@ -1,2 +1,1 @@
-git clone --recursive https://github.com/mrpaja/cv 
-
+git clone-- recursive https:  // github.com/mrpaja/cv

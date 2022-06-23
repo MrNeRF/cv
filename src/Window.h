@@ -1,22 +1,25 @@
 #ifndef OPENGL_WINDOW_H
 #define OPENGL_WINDOW_H
 
-#include "GLFW/glfw3.h"
 #include <chrono>
 #include <cstdint>
 #include <list>
 #include <ratio>
 #include <string>
+#include "GLFW/glfw3.h"
 
-class Window
-{
-    using seconds      = std::chrono::duration<double>;
+class Window {
+    using seconds = std::chrono::duration<double>;
     using milliseconds = std::chrono::duration<double, std::ratio_multiply<seconds::period, std::milli>>;
 
-public:
-    Window(const std::string name);
+   public:
+    explicit Window(const std::string& name) : Window{name, 800, 800} {}
+    explicit Window(const std::string& name, int height, int width) : _windowName{name},
+                                                                      _winHeight{height},
+                                                                      _winWidth{width} {}
     ~Window(void);
 
+    int Init();
     // Callbacks
     static void WindowResizeCallback(GLFWwindow* win, int h, int w);
     static void MouseInputCallback(GLFWwindow* win, int button, int action, int mods);
@@ -24,7 +27,7 @@ public:
     static void CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos);
     static void KeyboardCallback(GLFWwindow* win, int key, int scancode, int action, int mods);
 
-    GLFWwindow* GetGLFWWindow(void) { return m_windowInstance; }
+    GLFWwindow* GetGLFWWindow(void) { return _windowInstance; }
 
     // Associated class methods invoked by registered callbacks.
     void ViewPortUpdate(int width, int height);
@@ -34,18 +37,16 @@ public:
     void KeyboardDeviceUpdate(int key, int scancode, int action, int mods);
 
     // ...
-    float GetAspectRatio() { return static_cast<float>(std::max(winHeight, winWidth)) / static_cast<float>(std::min(winHeight, winWidth)); }
+    float GetAspectRatio() { return static_cast<float>(std::max(_winHeight, _winWidth)) / static_cast<float>(std::min(_winHeight, _winWidth)); }
 
-public:
-    int               winHeight = 800;
-    int               winWidth  = 800;
-    const std::string windowName;
-    bool              m_bKeyPressed = false;
-    int               m_key         = 0;
-    bool              m_bWireFrame  = false;
+   public:
+    const std::string _windowName;
+    int _winHeight;
+    int _winWidth;
+    int _key = 0;
 
-private:
-    GLFWwindow* m_windowInstance = nullptr;
+   private:
+    GLFWwindow* _windowInstance = nullptr;
 };
 
 #endif

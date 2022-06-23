@@ -1,0 +1,14 @@
+# Blender v3.1.0 Alpha OBJ File: 'dice.blend'
+# www.blender.org
+mtllib dice.mtl
+o Triangle
+v 0.00000 1.0000 -1.500000
+v -0.50000 -.50000 -1.500000
+v 0.50000 -.50000 -1.500000
+vt 0.651667 0.348333
+vt 0.348333 0.651667
+vt 0.348333 0.348333
+vn 0.0000 -1.0000 0.0000
+usemtl Material
+s off
+f 1/1/1 2/2/1 3/3/1
