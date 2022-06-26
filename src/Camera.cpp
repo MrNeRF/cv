@@ -6,44 +6,44 @@ static Eigen::Matrix4f ComputeFrustum(float left, float right, float bottom, flo
 
 const Eigen::Matrix4f& Camera::GetLookAt() const {
     // Right Hand Coordinate System
-    Eigen::Vector3f camDir = (m_eye - m_target).normalized();
-    Eigen::Vector3f camRight = (m_up.cross(camDir)).normalized();
+    Eigen::Vector3f camDir = (_eye - _target).normalized();
+    Eigen::Vector3f camRight = (_up.cross(camDir)).normalized();
     Eigen::Vector3f camUp = camDir.cross(camRight);
 
-    m_view.block(0, 0, 1, 3) = camRight.transpose();
-    m_view.block(1, 0, 1, 3) = camUp.transpose();
-    m_view.block(2, 0, 1, 3) = camDir.transpose();
-    m_view(0, 3) = -camRight.dot(m_eye);
-    m_view(1, 3) = -camUp.dot(m_eye);
-    m_view(2, 3) = -camDir.dot(m_eye);
-    m_view(3, 3) = 1.f;
+    _view.block(0, 0, 1, 3) = camRight.transpose();
+    _view.block(1, 0, 1, 3) = camUp.transpose();
+    _view.block(2, 0, 1, 3) = camDir.transpose();
+    _view(0, 3) = -camRight.dot(_eye);
+    _view(1, 3) = -camUp.dot(_eye);
+    _view(2, 3) = -camDir.dot(_eye);
+    _view(3, 3) = 1.f;
 
-    return m_view;
+    return _view;
 }
 
 void Camera::SetPerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane) {
-    m_zFar = zFarPlane;
-    m_zNear = zNearPlane;
-    m_fov = fov;
-    m_aspectRatio = aspectRatio;
+    _zFar = zFarPlane;
+    _zNear = zNearPlane;
+    _fov = fov;
+    _aspectRatio = aspectRatio;
 
-    float height = m_zNear * tanf(m_fov * .5f);
-    float width = height * m_aspectRatio;
+    float height = _zNear * tanf(_fov * .5f);
+    float width = height * _aspectRatio;
 
-    m_frustum = ComputeFrustum(-width, width, -height, height, m_zNear, m_zFar);
+    _frustum = ComputeFrustum(-width, width, -height, height, _zNear, _zFar);
 }
 
 const Eigen::Matrix4f& Camera::GetPerspectiveProjection() const {
-    ASSERT(!m_frustum.isZero())
-    return m_frustum;
+    ASSERT(!_frustum.isZero())
+    return _frustum;
 }
 
 void Camera::UpdateOrientation(const Eigen::AngleAxisf& angleAxis) {
     Eigen::Quaternionf rotationQuat = Eigen::Quaternionf(angleAxis);
-    Eigen::Quaternionf tmp = rotationQuat * Eigen::Quaternionf(m_eye.x(), m_eye.y(), m_eye.z(), 0.f) * rotationQuat.conjugate();
-    m_eye.x() = tmp.x();
-    m_eye.y() = tmp.y();
-    m_eye.z() = tmp.z();
+    Eigen::Quaternionf tmp = rotationQuat * Eigen::Quaternionf(_eye.x(), _eye.y(), _eye.z(), 0.f) * rotationQuat.conjugate();
+    _eye.x() = tmp.x();
+    _eye.y() = tmp.y();
+    _eye.z() = tmp.z();
 }
 
 Eigen::Matrix4f ComputeFrustum(float left, float right, float bottom, float top, float near, float far) {

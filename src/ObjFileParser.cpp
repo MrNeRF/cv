@@ -105,9 +105,8 @@ std::unique_ptr<Texture> ObjFileParser::GetTexture(const File& rRawData) {
         }
     }
 
-
     if (!filename.empty()) {
-        auto materialFile  = File(filename, File::FileType::Model);
+        auto materialFile = File(filename, File::FileType::Model);
         const std::string buffer = materialFile.GetContents();
         std::istringstream iss(buffer);
         for (std::string line; std::getline(iss, line);) {

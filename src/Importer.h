@@ -1,8 +1,8 @@
 #ifndef CV_IMPORTER_H
 #define CV_IMPORTER_H
 
-#include <string>
 #include <memory>
+#include <string>
 
 class Model;
 class IRenderable;

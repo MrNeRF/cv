@@ -30,8 +30,7 @@ void PhongShader::SetMaterial(const Material& rMaterial) {
 }
 
 void PhongShader::SetLightSource(std::shared_ptr<Light> spLight) {
-    if(spLight == nullptr)
-    {
+    if (spLight == nullptr) {
         return;
     }
     Shader::activateShader();
@@ -69,5 +68,4 @@ void PhongShader::ActivateShader(const Model* pModel) {
     SetQuat("transform.qOrientation", pModel->GetOrientation());
     SetTransformationMatrix("normalRotationMatrix", pModel->GetOrientation().toRotationMatrix());
     SetVector("transform.position", pModel->GetPosition());
-
 }

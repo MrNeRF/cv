@@ -11,13 +11,13 @@ static std::string fileTypeFolderMapping(File::FileType fileType) {
     case File::FileType::Model:
         return "data";
     default:
-    // Logger::GetInstance().GetLogger().error("FileType not implemented!");
+        // Logger::GetInstance().GetLogger().error("FileType not implemented!");
         return "";
     }
 }
 
 File::File(const std::string& fileName, const FileType fileType)
-    : inputPath{std::filesystem::current_path().parent_path().string() + "/" +fileTypeFolderMapping(fileType) + "/" + fileName} {
+    : inputPath{std::filesystem::current_path().parent_path().string() + "/" + fileTypeFolderMapping(fileType) + "/" + fileName} {
     if (is_empty(inputPath) || !exists(inputPath)) {
         std::cerr << "Error! No filename provided!\n";
         return;

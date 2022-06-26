@@ -6,7 +6,8 @@
 #include <list>
 #include <ratio>
 #include <string>
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+#include <Eigen/Dense>
 
 class Window {
     using seconds = std::chrono::duration<double>;
@@ -21,6 +22,8 @@ class Window {
 
     int Init();
     // Callbacks
+
+    Eigen::Vector3f GetLastDirection () {auto tmp = _lastDirection;  _lastDirection = Eigen::Vector3f(0.f, 0.f ,0.f); return tmp;}
     static void WindowResizeCallback(GLFWwindow* win, int h, int w);
     static void MouseInputCallback(GLFWwindow* win, int button, int action, int mods);
     static void MouseWheelCallback(GLFWwindow* win, double xoffset, double yoffset);
@@ -40,6 +43,7 @@ class Window {
     float GetAspectRatio() { return static_cast<float>(std::max(_winHeight, _winWidth)) / static_cast<float>(std::min(_winHeight, _winWidth)); }
 
    public:
+    Eigen::Vector3f _lastDirection = Eigen::Vector3f(0.f, 0.f, 0.f);
     const std::string _windowName;
     int _winHeight;
     int _winWidth;

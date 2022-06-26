@@ -4,8 +4,8 @@
 #include "Importer.h"
 #include <regex>
 #include "File.h"
-#include "Model.h"
 #include "IRenderable.h"
+#include "Model.h"
 #include "ObjFileParser.h"
 
 bool IsFileFormatSupport(const std::string& fileEnding) {

@@ -20,6 +20,7 @@ class PhongShader : public Shader {
     void SetMaterial(const Material& rMaterial);
     void SetLightSource(std::shared_ptr<Light> spLight);
     void SetCamera(std::shared_ptr<Camera> spCamera);
+
    private:
     std::unique_ptr<Material> _spMaterial;
     std::shared_ptr<Light> _spLight;

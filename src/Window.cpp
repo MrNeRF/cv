@@ -196,6 +196,18 @@ void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods) {
         case GLFW_KEY_Q:
             glfwSetWindowShouldClose(_windowInstance, true);
             break;
+        case GLFW_KEY_A:
+            _lastDirection.x() = -1.f;
+            break;
+        case GLFW_KEY_D:
+            _lastDirection.x() = 1.f;
+            break;
+        case GLFW_KEY_S:
+            _lastDirection.z() = -1.f;
+            break;
+        case GLFW_KEY_W:
+            _lastDirection.z() = 1.f;
+            break;
         }
     }
 }
@@ -204,4 +216,5 @@ void Window::MouseWheelUpdate(double xoffset, double yoffset) {
 }
 
 void Window::CursorPositionUpdate(double xCursorPos, double yCursorPos) {
+
 }

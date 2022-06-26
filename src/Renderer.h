@@ -14,8 +14,7 @@ class Model;
 
 class Renderer {
    private:
-    struct RenderData
-    {
+    struct RenderData {
         std::shared_ptr<IRenderable> spRenderable;
         OpenGL3DDataObject openglData;
     };

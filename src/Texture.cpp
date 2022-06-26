@@ -1,7 +1,7 @@
 #include "Texture.h"
+#include "File.h"
 #include "Logger.h"
 #include "stb_image.h"
-#include "File.h"
 
 Texture::Texture(const File& file)
     : _name(file.GetFileName() + "." + file.GetFileEnding()), _path(file.GetFilePath()) {

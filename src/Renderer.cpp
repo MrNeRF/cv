@@ -4,7 +4,7 @@
 
 #include "Renderer.h"
 void Renderer::Render() {
-    for(auto& rData : _renderData) {
+    for (auto& rData : _renderData) {
         rData.spRenderable->Render();
         rData.openglData.DrawObject(GL_TRIANGLES);
     }
@@ -20,12 +20,10 @@ void Renderer::AddRenderable(std::unique_ptr<IRenderable> spRenderObject) {
 
 void Renderer::RemoveRenderable(const std::string& rName) {
     uint32_t uiPos = 0;
-    for(auto& rData : _renderData) {
-        if (rData.spRenderable->GetName() == rName)
-        {
+    for (auto& rData : _renderData) {
+        if (rData.spRenderable->GetName() == rName) {
             _renderData.erase(_renderData.begin() + uiPos);
-        }
-        else {
+        } else {
             ++uiPos;
         }
     }

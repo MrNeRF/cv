@@ -1,6 +1,6 @@
+#include <memory>
 #include "Viewer.h"
 #include "Window.h"
-#include <memory>
 
 int main() {
 

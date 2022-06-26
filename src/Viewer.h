@@ -1,10 +1,10 @@
 #ifndef VIEWER_H
 #define VIEWER_H
 
+#include <Renderer.h>
 #include <Eigen/Dense>
 #include <memory>
 #include <string>
-#include <Renderer.h>
 
 class Camera;
 class Window;

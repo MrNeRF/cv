@@ -13,6 +13,7 @@ class File {
         Model,
         Shader
     };
+
    public:
     explicit File(const std::string& fileName, const FileType fileType);
     std::string GetContents() const;

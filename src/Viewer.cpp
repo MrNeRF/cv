@@ -1,13 +1,12 @@
 #include "Viewer.h"
 #include <GLFW/glfw3.h>
 #include "Camera.h"
+#include "Importer.h"
 #include "Light.h"
 #include "Logger.h"
 #include "Material.h"
-#include "Importer.h"
 #include "PhongShader.h"
 #include "Window.h"
-#include "Camera.h"
 
 Viewer::Viewer(std::unique_ptr<Window> spWindow) : _spWindow{std::move(spWindow)} {
 }
@@ -34,9 +33,9 @@ void Viewer::Run(void) {
     _renderer.AddRenderable(std::move(spModel));
     CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));
 
-    //std::vector<std::string> filenames = File("Shader").GetDirectoryContents();
-    //std::vector<const char*> items;
-    //std::transform(std::begin(filenames), std::end(filenames), std::back_inserter(items), std::me_fn(&std::string::c_str));
+    // std::vector<std::string> filenames = File("Shader").GetDirectoryContents();
+    // std::vector<const char*> items;
+    // std::transform(std::begin(filenames), std::end(filenames), std::back_inserter(items), std::me_fn(&std::string::c_str));
     render();
 }
 
@@ -55,6 +54,7 @@ void Viewer::render() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         // UpdatePositions
+        _spCamera->UpdateCameraPosition(_spWindow->GetLastDirection());
         // Draw
         _renderer.Render();
         glfwSwapBuffers(_spWindow->GetGLFWWindow());
