@@ -7,3 +7,6 @@
 [submodule "extern/spdlog"]
 	path = extern/spdlog
 	url = https://github.com/gabime/spdlog/
+[submodule "extern/ffmpeg"]
+	path = extern/ffmpeg
+	url = https://git.ffmpeg.org/ffmpeg.git
