@@ -16,7 +16,7 @@ class Camera {
     const Eigen::Matrix4f& GetPerspectiveProjection() const;
     void UpdateOrientation(const Eigen::AngleAxisf& angleAxis);
     const Eigen::Vector3f& GetCameraPosition() const { return _eye; }
-    void UpdateCameraPosition(Eigen::Vector3f pos) { _eye += pos;}
+    void UpdateCameraPosition(Eigen::Vector3f pos) { _eye += pos; }
 
     // Observer
    private:

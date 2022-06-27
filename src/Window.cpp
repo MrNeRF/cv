@@ -216,5 +216,4 @@ void Window::MouseWheelUpdate(double xoffset, double yoffset) {
 }
 
 void Window::CursorPositionUpdate(double xCursorPos, double yCursorPos) {
-
 }

@@ -41,22 +41,23 @@ void Viewer::Run(void) {
 
 // RenderLoop
 void Viewer::render() {
+
+    CHECK_GL_ERROR_(glClearColor(_backgroundColor.x() * _backgroundColor.w(),
+                                 _backgroundColor.y() * _backgroundColor.w(),
+                                 _backgroundColor.z() * _backgroundColor.w(),
+                                 _backgroundColor.w()));
+    CHECK_GL_ERROR_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
+
+    CHECK_GL_ERROR_(glDepthFunc(GL_LESS))
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    // UpdatePositions
+    _spCamera->UpdateCameraPosition(_spWindow->GetLastDirection());
+    // Draw
+    _renderer.Render();
+    glfwSwapBuffers(_spWindow->GetGLFWWindow());
+
     while (!glfwWindowShouldClose(_spWindow->GetGLFWWindow())) {
         glfwPollEvents();
-
-        CHECK_GL_ERROR_(glClearColor(_backgroundColor.x() * _backgroundColor.w(),
-                                     _backgroundColor.y() * _backgroundColor.w(),
-                                     _backgroundColor.z() * _backgroundColor.w(),
-                                     _backgroundColor.w()));
-        CHECK_GL_ERROR_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
-
-        CHECK_GL_ERROR_(glDepthFunc(GL_LESS))
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-        // UpdatePositions
-        _spCamera->UpdateCameraPosition(_spWindow->GetLastDirection());
-        // Draw
-        _renderer.Render();
-        glfwSwapBuffers(_spWindow->GetGLFWWindow());
     }
 }
