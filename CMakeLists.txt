@@ -75,12 +75,24 @@ target_link_libraries(
           -lGLU
           -lGL
           ${GLFW3_LIBRARY})
+
 add_library(libavcodec STATIC IMPORTED)
 set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavcodec.a)
 set_target_properties(libavcodec PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
-add_library(libavformat STATIC IMPORTED)
-set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavformat.a)
-set_target_properties(libavformat PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
+
+add_library(libavutil STATIC IMPORTED)
+set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavutil.a)
+set_target_properties(libavutil PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
+#add_library(libavformat STATIC IMPORTED)
+#set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavformat.a)
+#set_target_properties(libavformat PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
+#add_library(libswscale STATIC IMPORTED)
+#set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libswscale.a)
+#set_target_properties(libswscale PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
+add_library(libswresample STATIC IMPORTED)
+set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libswscale.a)
+set_target_properties(libswresample PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
+
 add_executable(video src/video.cpp)
 target_include_directories(video PRIVATE include)
-target_link_libraries(cv PRIVATE libavcodec libavformat)
+target_link_libraries(video PRIVATE -lavcodec -llzma -lz -lswresample  -lavutil)
