@@ -11,7 +11,8 @@ class File {
    public:
     enum class FileType {
         Model,
-        Shader
+        Shader,
+        Video
     };
 
    public:

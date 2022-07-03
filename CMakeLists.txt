@@ -38,6 +38,7 @@ set(MY_EXECUTABLE_SOURCES
     src/File.cpp
     src/Logger.cpp
     src/main.cpp
+    src/Image.cpp
     src/Importer.cpp
     src/Model.cpp
     src/ObjFileParser.cpp
@@ -93,6 +94,18 @@ add_library(libswresample STATIC IMPORTED)
 set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libswscale.a)
 set_target_properties(libswresample PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
 
-add_executable(video src/video.cpp)
+add_executable(video src/videotest.cpp src/VideoStream.cpp src/Image.cpp src/File.cpp)
+#add_executable(video src/video.cpp)
 target_include_directories(video PRIVATE include)
-target_link_libraries(video PRIVATE -lavcodec -llzma -lz -lswresample -lavutil -lavformat -lm -latomic -lz)
+target_link_libraries(video PRIVATE eigen spdlog -lavcodec -llzma -lz -lswresample -lavutil -lavformat -lm -latomic -lz)
+target_compile_options(
+       video
+        PRIVATE -ggdb3
+        -O0
+        -Wall
+        -Wextra
+        -Werror
+        -Wpedantic
+        -Wno-write-strings
+        -Wno-unused-parameter
+        -D_GLIBCXX_DEBUG)

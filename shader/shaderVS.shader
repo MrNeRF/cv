@@ -1,4 +1,4 @@
-#version 420 core
+#version 460 core
 layout (location = 0) in vec3 vertPosIn;
 layout (location = 1) in vec2 uvIn;
 layout (location = 2) in vec3 vertNormalIn;
