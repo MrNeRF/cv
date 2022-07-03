@@ -35,10 +35,13 @@ message(STATUS "Found GLEW in ${GLEW_INCLUDE_DIR}")
 
 set(MY_EXECUTABLE_SOURCES
     src/Camera.cpp
+    src/CanvasShader.cpp
     src/File.cpp
     src/Logger.cpp
     src/main.cpp
     src/Image.cpp
+    src/ImageCanvas.cpp
+    src/ImageViewer.cpp
     src/Importer.cpp
     src/Model.cpp
     src/ObjFileParser.cpp
@@ -50,8 +53,7 @@ set(MY_EXECUTABLE_SOURCES
     src/Texture.cpp
     src/VideoStream.cpp
     src/Viewer3D.cpp
-    src/Window.cpp
-    )
+    src/Window.cpp)
 
 add_subdirectory(extern)
 add_executable(cv ${MY_EXECUTABLE_SOURCES})

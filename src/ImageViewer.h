@@ -1,5 +1,5 @@
-#ifndef VIEWER_H
-#define VIEWER_H
+#ifndef IMAGE_VIEWER_H
+#define IMAGE_VIEWER_H
 
 #include <Renderer.h>
 #include <Window.h>
@@ -13,8 +13,8 @@ class Camera;
 class Viewer3D : public Viewer {
    public:
     Viewer3D(const std::string windowName) : _spWindow{std::make_unique<Window>(windowName)} {}
-    int Init() override;
-    void Run(void) override;
+    int Init();
+    void Run(void);
     void SetBackgroundColor(const Eigen::Vector4f& color) { _backgroundColor = color; }
 
    private:
