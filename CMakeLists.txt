@@ -48,7 +48,8 @@ set(MY_EXECUTABLE_SOURCES
     src/Shader.cpp
     src/stb_image.cpp
     src/Texture.cpp
-    src/Viewer.cpp
+    src/VideoStream.cpp
+    src/Viewer3D.cpp
     src/Window.cpp
     )
 
@@ -66,16 +67,7 @@ target_compile_options(
           -Wno-write-strings
           -Wno-unused-parameter
           -D_GLIBCXX_DEBUG)
-target_link_libraries(
-  cv
-  PRIVATE -pthread
-          spdlog
-          eigen
-          fmt
-          ${GLEW_LIBRARY}
-          -lGLU
-          -lGL
-          ${GLFW3_LIBRARY})
+
 
 add_library(libavcodec STATIC IMPORTED)
 set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavcodec.a)
@@ -94,18 +86,23 @@ add_library(libswresample STATIC IMPORTED)
 set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libswscale.a)
 set_target_properties(libswresample PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
 
-add_executable(video src/videotest.cpp src/VideoStream.cpp src/Image.cpp src/File.cpp)
-#add_executable(video src/video.cpp)
-target_include_directories(video PRIVATE include)
-target_link_libraries(video PRIVATE eigen spdlog -lavcodec -llzma -lz -lswresample -lavutil -lavformat -lm -latomic -lz)
-target_compile_options(
-       video
-        PRIVATE -ggdb3
-        -O0
-        -Wall
-        -Wextra
-        -Werror
-        -Wpedantic
-        -Wno-write-strings
-        -Wno-unused-parameter
-        -D_GLIBCXX_DEBUG)
+target_link_libraries(
+  cv
+  PRIVATE -pthread
+          spdlog
+          eigen
+          fmt
+          ${GLEW_LIBRARY}
+          -lGLU
+          -lGL
+          ${GLFW3_LIBRARY}
+        -lavcodec
+        -llzma
+        -lz
+        -lswresample
+        -lavutil
+        -lavformat
+        -lm
+        -latomic
+        -lz
+)

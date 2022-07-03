@@ -4,7 +4,7 @@
 #include "Image.h"
 
 // save a frame into a .pgm file
-//static void save_frame_as_jpeg(AVCodecContext *pCodecCtx, AVFrame *pFrame, int frameNbr);
+// static void save_frame_as_jpeg(AVCodecContext *pCodecCtx, AVFrame *pFrame, int frameNbr);
 
 bool VideoStream::initStream() {
     auto &rLogger = Logger::GetInstance().GetLogger();
@@ -71,12 +71,13 @@ bool VideoStream::Open(const File &rFile) {
     const AVCodec *pCodec = nullptr;
     const AVCodecParameters *pCodecParameters = nullptr;
     if (getCodedAndParams(&pCodec, &pCodecParameters) < 0) {
-         return false;
+        return false;
     }
 
     _pCodecContext = avcodec_alloc_context3(pCodec);
     if (_pCodecContext == nullptr) {
-        rLogger.error("Failed to allocated memory for AVCodecContext"); return false;
+        rLogger.error("Failed to allocated memory for AVCodecContext");
+        return false;
     }
 
     // Fill the codec context based on the values from the supplied codec parameters
@@ -136,7 +137,7 @@ int VideoStream::decodePacket() {
             rLogger.info("EAGAIN");
             break;
         case AVERROR_EOF:
-//            rLogger.info("AVERROR_EOF");
+            //            rLogger.info("AVERROR_EOF");
             break;
         case AVERROR(EINVAL):
             rLogger.info("EINVAL");

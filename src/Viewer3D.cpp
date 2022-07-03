@@ -1,4 +1,4 @@
-#include "Viewer.h"
+#include "Viewer3D.h"
 #include <GLFW/glfw3.h>
 #include "Camera.h"
 #include "Importer.h"
@@ -8,18 +8,15 @@
 #include "PhongShader.h"
 #include "Window.h"
 
-Viewer::Viewer(std::unique_ptr<Window> spWindow) : _spWindow{std::move(spWindow)} {
-}
-
-int Viewer::Init(void) {
+int Viewer3D::Init(void) {
     _spCamera = std::make_shared<Camera>();
     _spCamera->SetPerspectiveProjection(45.f, _spWindow->GetAspectRatio(), 0.1, 50.f);
     return _spWindow->Init();
 }
 
-void Viewer::Run(void) {
+void Viewer3D::Run(void) {
     auto& rLogger = Logger::GetInstance().GetLogger();
-    rLogger.info("Viewer::Run()");
+    rLogger.info("Viewer3D::Run()");
 
     auto spModel = Importer::ImportModel("dice.obj");
     auto spPhongShader = std::make_unique<PhongShader>();
@@ -40,7 +37,7 @@ void Viewer::Run(void) {
 }
 
 // RenderLoop
-void Viewer::render() {
+void Viewer3D::render() {
 
     CHECK_GL_ERROR_(glClearColor(_backgroundColor.x() * _backgroundColor.w(),
                                  _backgroundColor.y() * _backgroundColor.w(),
