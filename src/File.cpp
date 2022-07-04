@@ -10,6 +10,7 @@ static std::string fileTypeFolderMapping(File::FileType fileType) {
         return "shader";
     case File::FileType::Model:
     case File::FileType::Video:
+    case File::FileType::Image:
         return "data";
     default:
         // Logger::GetInstance().GetLogger().error("FileType not implemented!");

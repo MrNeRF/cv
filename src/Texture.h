@@ -3,9 +3,11 @@
 #include <string>
 
 class File;
+class Image;
 
 struct Texture {
     Texture(const File& file);
+    Texture(const Image& image);
     ~Texture();
 
     const std::string _name;

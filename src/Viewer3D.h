@@ -14,7 +14,7 @@ class Viewer3D : public Viewer {
    public:
     Viewer3D(const std::string windowName) : _spWindow{std::make_unique<Window>(windowName)} {}
     int Init() override;
-    void Run(void) override;
+    void Run(void);
     void SetBackgroundColor(const Eigen::Vector4f& color) { _backgroundColor = color; }
 
    private:

@@ -5,10 +5,12 @@
 #ifndef CV_IMAGECANVAS_H
 #define CV_IMAGECANVAS_H
 
-#include "IRenderable.h"
 #include <memory>
+#include "IRenderable.h"
 
 struct Mesh;
+class Shader;
+struct Texture;
 
 class ImageCanvas : public IRenderable {
    public:
@@ -19,8 +21,12 @@ class ImageCanvas : public IRenderable {
     Mesh* GetMesh() override;
     Texture* GetTexture() override;
     const std::string& GetName() const override;
+
    private:
     std::unique_ptr<Mesh> _spMesh;
+    std::unique_ptr<Shader> _spShader;
+    std::unique_ptr<Texture> _spTexture;
+    std::string _name = "Image";
 };
 
 #endif  // CV_IMAGECANVAS_H

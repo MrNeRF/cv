@@ -9,13 +9,13 @@
 #include "Viewer.h"
 
 class Camera;
+class Image;
 
-class Viewer3D : public Viewer {
+class ImageViewer : public Viewer {
    public:
-    Viewer3D(const std::string windowName) : _spWindow{std::make_unique<Window>(windowName)} {}
-    int Init();
-    void Run(void);
-    void SetBackgroundColor(const Eigen::Vector4f& color) { _backgroundColor = color; }
+    ImageViewer(const std::string windowName) : _spWindow{std::make_unique<Window>(windowName, 600, 800)} {}
+    int Init() override;
+    void ShowImage(const Image& rImage);
 
    private:
     void render();
@@ -24,7 +24,6 @@ class Viewer3D : public Viewer {
     std::unique_ptr<Window> _spWindow;
     std::shared_ptr<Camera> _spCamera;
     Renderer _renderer;
-    Eigen::Vector4f _backgroundColor;
 };
 
 #endif

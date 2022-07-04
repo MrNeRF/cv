@@ -11,12 +11,12 @@
 class Light;
 class Material;
 class Camera;
-class Model;
+class IRenderable;
 
 class PhongShader : public Shader {
    public:
     PhongShader();
-    virtual void ActivateShader(const Model* pModel) override;
+    void ActivateShader(const IRenderable* pRenderObject) override;
     void SetMaterial(const Material& rMaterial);
     void SetLightSource(std::shared_ptr<Light> spLight);
     void SetCamera(std::shared_ptr<Camera> spCamera);

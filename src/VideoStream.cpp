@@ -1,10 +1,34 @@
 #include "VideoStream.h"
+#include <fstream>
 #include <string>
 #include "File.h"
 #include "Image.h"
 
 // save a frame into a .pgm file
 // static void save_frame_as_jpeg(AVCodecContext *pCodecCtx, AVFrame *pFrame, int frameNbr);
+
+// static void save_gray_frame(unsigned char *buf, int wrap, int xsize, int ysize, char *filename)
+//{
+//     FILE *f;
+//     int k;
+//     f = fopen(filename,"w");
+//     // writing the minimal required header for a pgm file format
+//     // portable graymap format -> https://en.wikipedia.org/wiki/Netpbm_format#PGM_example
+//     fprintf(f, "P5\n%d %d\n%d\n", xsize, ysize, 255);
+//
+//     // writing line by line
+//     for (k = 0; k < ysize; k++)
+//         fwrite(buf + k * wrap, 1, xsize, f);
+//     fclose(f);
+//
+//     std::ofstream out("videooutput2.ppm");
+//     out << "P5\n" << xsize << ' ' << ysize << "\n255\n";
+//     for (int i = 0; i < ysize; i++) {
+//         for (int j = 0; j < xsize; j++) {
+//             out << (unsigned char)buf[ i * xsize + j];
+//         }
+//     }
+// }
 
 bool VideoStream::initStream() {
     auto &rLogger = Logger::GetInstance().GetLogger();
@@ -172,6 +196,7 @@ int VideoStream::getValidFrame() {
 
 void VideoStream::operator>>(Image &img) {
     auto &rLogger = Logger::GetInstance().GetLogger();
+    //    save_gray_frame(_pFrame->data[0], _pFrame->linesize[0], _pFrame->width, _pFrame->height, "videooutput.ppm" );
     img = Image(_pFrame->width, _pFrame->height, _pFrame->data[0]);
     av_packet_unref(_pPacket);
 

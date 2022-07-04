@@ -14,7 +14,7 @@
 #include "File.h"
 #include "Logger.h"
 
-class Model;
+class IRenderable;
 
 class Shader {
    public:
@@ -28,7 +28,7 @@ class Shader {
     explicit Shader(const std::string& name)
         : _shaderName(name){};
 
-    virtual void ActivateShader(const Model* pModel) = 0;
+    virtual void ActivateShader(const IRenderable* pRenderObject) = 0;
     unsigned int GetShaderProgramID(void) { return _shaderProgramID; };
 
     template <typename T>

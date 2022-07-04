@@ -48,7 +48,7 @@ void PhongShader::SetCamera(std::shared_ptr<Camera> spCamera) {
     _spCamera = spCamera;
 }
 
-void PhongShader::ActivateShader(const Model* pModel) {
+void PhongShader::ActivateShader(const IRenderable* pRenderObject) {
     if (_spLight == nullptr) {
         Logger::GetInstance().GetLogger().warn("Light not set in shader {}", shaderName);
     }
@@ -64,8 +64,14 @@ void PhongShader::ActivateShader(const Model* pModel) {
     SetTransformationMatrix("view", _spCamera->GetLookAt());
     SetTransformationMatrix("projection", _spCamera->GetPerspectiveProjection());
 
-    SetQuat("transform.qconjOrientation", pModel->GetOrientation().conjugate());
-    SetQuat("transform.qOrientation", pModel->GetOrientation());
-    SetTransformationMatrix("normalRotationMatrix", pModel->GetOrientation().toRotationMatrix());
-    SetVector("transform.position", pModel->GetPosition());
+    const Model* pModel = dynamic_cast<const Model*>(pRenderObject);
+    if (pModel != nullptr) {
+        SetQuat("transform.qconjOrientation", pModel->GetOrientation().conjugate());
+        SetQuat("transform.qOrientation", pModel->GetOrientation());
+        SetTransformationMatrix("normalRotationMatrix", pModel->GetOrientation().toRotationMatrix());
+        SetVector("transform.position", pModel->GetPosition());
+    } else {
+        ASSERT(0);
+        Logger::GetInstance().GetLogger().error("IRenderable should be of type model.");
+    }
 }

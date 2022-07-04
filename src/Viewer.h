@@ -9,7 +9,6 @@ class Viewer {
    public:
     virtual ~Viewer() = default;
     virtual int Init() = 0;
-    virtual void Run(void) = 0;
 };
 
 #endif  // CV_VIEWER_H

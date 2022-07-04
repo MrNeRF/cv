@@ -4,7 +4,7 @@
 
 #include "CanvasShader.h"
 #include "File.h"
-#include "Model.h"
+#include "IRenderable.h"
 
 static const std::filesystem::path fragmentShaderName = "imageCanvasFS.shader";
 static const std::filesystem::path vertexShaderName = "imageCanvasVS.shader";
@@ -16,7 +16,7 @@ CanvasShader::CanvasShader() : Shader(shaderName) {
     initShaders(vertexShader, fragmentShader);
 }
 
-void CanvasShader::ActivateShader(const Model *pModel) {
+void CanvasShader::ActivateShader(const IRenderable* pRenderObject) {
     if (_spCamera == nullptr) {
         Logger::GetInstance().GetLogger().warn("Camera not set in shader {}", shaderName);
     }

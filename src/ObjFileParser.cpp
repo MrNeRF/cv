@@ -62,6 +62,8 @@ std::unique_ptr<Mesh> ObjFileParser::GetMesh(const File& rRawData) {
         }
     }
 
+    spMesh->bHasUVs = true;
+    spMesh->bHasNormals = true;
     spMesh->faces = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit>(indices.size() / 3, 3 + 2 + 3);
     auto& faces = spMesh->faces;
     for (size_t i = 0, j = 0; i < indices.size(); i += 3, ++j) {

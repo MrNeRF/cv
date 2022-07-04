@@ -11,6 +11,9 @@
 
 struct Mesh {
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit> faces;
+    bool bHasVertices = true;
+    bool bHasUVs = false;
+    bool bHasNormals = false;
 };
 
 #endif  // LEARNOPENGL_MESH_H

@@ -6,13 +6,13 @@
 #define CV_CANVASSHADER_H
 
 #include "Shader.h"
-class Model;
+class IRenderable;
 class Camera;
 
 class CanvasShader : public Shader {
    public:
     CanvasShader();
-    void ActivateShader(const Model* pModel) override;
+    void ActivateShader(const IRenderable* pRenderObject) override;
     void SetCamera(std::shared_ptr<Camera> spCamera);
 
    private:

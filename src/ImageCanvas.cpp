@@ -5,6 +5,8 @@
 #include "ImageCanvas.h"
 #include <Mesh.h>
 #include <Eigen/Dense>
+#include "Logger.h"
+#include "Shader.h"
 
 enum Position {
     POS_UPPER_LEFT = 0,
@@ -25,14 +27,14 @@ enum Triangle {
     FIRST_CORNER_A = 0,
     FIRST_CORNER_B = 1,
     FIRST_CORNER_C = 2,
-    SECOND_CORNER_A = 0,
-    SECOND_CORNER_B = 1,
-    SECOND_CORNER_C = 2,
+    SECOND_CORNER_A = 3,
+    SECOND_CORNER_B = 4,
+    SECOND_CORNER_C = 5,
 };
-Eigen::Vector3f upperLeftCorner = {-1.f, 1.f, 0.f};
-Eigen::Vector3f upperRightCorner = {1.f, 1.f, 0.f};
-Eigen::Vector3f lowerLeftCorner = {-1.f, -1.f, 0.f};
-Eigen::Vector3f lowerRightCorner = {1.f, -1.f, 0.f};
+Eigen::Vector3f upperLeftCorner = {-0.5f, .5f, 0.f};
+Eigen::Vector3f upperRightCorner = {.5f, .5f, 0.f};
+Eigen::Vector3f lowerLeftCorner = {-.5f, -.5f, 0.f};
+Eigen::Vector3f lowerRightCorner = {.5f, -.5f, 0.f};
 // indices UPPER_LEFT, UPPER_RIGHT, LOWER_LEFT,  UPPER_RIGHT,  LOWER_RIGHT, LOWER_LEFT
 
 Eigen::Vector2f upperLeftUV = {0.f, 1.f};
@@ -55,7 +57,7 @@ Eigen::Vector2f lowerRightUV = {1.f, 0.f};
 // faces(j, 4) = uv.y();
 
 ImageCanvas::ImageCanvas() {
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit> canvas = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit>(4, 5);
+    auto canvas = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit>(6, 5);
     canvas(Triangle::FIRST_CORNER_A, COOR_X) = upperLeftCorner.x();
     canvas(Triangle::FIRST_CORNER_A, COOR_Y) = upperLeftCorner.y();
     canvas(Triangle::FIRST_CORNER_A, COOR_Z) = upperLeftCorner.z();
@@ -94,25 +96,30 @@ ImageCanvas::ImageCanvas() {
 
     _spMesh = std::make_unique<Mesh>();
     _spMesh->faces = canvas;
+    _spMesh->bHasUVs = true;
+    _spMesh->bHasNormals = false;
+}
+void ImageCanvas::Render() {
+    ASSERT(_spShader != nullptr);
+    _spShader->ActivateShader(this);
+}
+void ImageCanvas::SetTexture(std::unique_ptr<Texture> spTexture) {
+    ASSERT(spTexture != nullptr);
+    _spTexture = std::move(spTexture);
 }
 
 void ImageCanvas::SetShader(std::unique_ptr<Shader> spShader) {
+    ASSERT(spShader != nullptr);
+    _spShader = std::move(spShader);
 }
-
-void ImageCanvas::SetTexture(std::unique_ptr<Texture> spTexture) {
-}
-
-void ImageCanvas::Render() {
-}
-
 Mesh* ImageCanvas::GetMesh() {
-    std return nullptr;
+    return _spMesh.get();
 }
 
 Texture* ImageCanvas::GetTexture() {
-    return nullptr;
+    return _spTexture.get();
 }
 
 const std::string& ImageCanvas::GetName() const {
-    return <#initializer #>;
+    return _name;
 }
