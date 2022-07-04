@@ -26,7 +26,7 @@ class ImageCanvas : public IRenderable {
     std::unique_ptr<Mesh> _spMesh;
     std::unique_ptr<Shader> _spShader;
     std::unique_ptr<Texture> _spTexture;
-    std::string _name = "Image";
+    std::string _name = "Canvas";
 };
 
 #endif  // CV_IMAGECANVAS_H

@@ -73,6 +73,20 @@ void OpenGL3DDataObject::InitializeTextureBuffer(Texture* pTexture) {
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
+void OpenGL3DDataObject::UpdateTextureBuffer(const Texture* pTexture) {
+    if (pTexture == nullptr) {
+        return;
+    }
+    if (m_Texture1 != std::numeric_limits<unsigned int>::max()) {
+        glBindTexture(GL_TEXTURE_2D, m_Texture1);
+    } else {
+        glGenTextures(1, &m_Texture1);
+    }
+    // Here is a hack for a greyscale picture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, pTexture->_width, pTexture->_height, 0, GL_RED, GL_UNSIGNED_BYTE, pTexture->_pData);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
 void OpenGL3DDataObject::DrawObject(GLenum mode) const {
     glActiveTexture(GL_TEXTURE0);
     if (m_Texture1 != std::numeric_limits<unsigned int>::max()) {

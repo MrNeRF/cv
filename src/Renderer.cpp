@@ -28,3 +28,11 @@ void Renderer::RemoveRenderable(const std::string& rName) {
         }
     }
 }
+void Renderer::UpdateTexture(const std::string& rName, const Texture* pTexture)
+{
+    for (auto& rData : _renderData) {
+        if (rData.spRenderable->GetName() == rName) {
+            rData.openglData.UpdateTextureBuffer(pTexture);
+        }
+    }
+}

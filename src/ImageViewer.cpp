@@ -13,22 +13,24 @@
 int ImageViewer::Init(void) {
     _spCamera = std::make_shared<Camera>();
     _spCamera->SetPerspectiveProjection(45.f, _spWindow->GetAspectRatio(), 0.1, 50.f);
-    return _spWindow->Init();
-}
-
-void ImageViewer::ShowImage(const Image& rImage) {
-    auto& rLogger = Logger::GetInstance().GetLogger();
-    rLogger.info("Viewer3D::ShowImage()");
+    _spWindow->Init();
 
     auto spCanvasShader = std::make_unique<CanvasShader>();
     spCanvasShader->SetCamera(_spCamera);
 
     auto spCanvas = std::make_unique<ImageCanvas>();
     spCanvas->SetShader(std::move(spCanvasShader));
-    auto spTexture = std::make_unique<Texture>(rImage);
-    spCanvas->SetTexture(std::move(spTexture));
 
     _renderer.AddRenderable(std::move(spCanvas));
+    return 0;
+}
+
+void ImageViewer::ShowImage(const Image& rImage) {
+    auto& rLogger = Logger::GetInstance().GetLogger();
+    rLogger.info("Viewer3D::ShowImage()");
+
+    auto spTexture = std::make_unique<Texture>(rImage);
+    _renderer.UpdateTexture("Canvas", spTexture.get());
     CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));
     render();
 }

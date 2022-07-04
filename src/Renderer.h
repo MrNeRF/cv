@@ -10,6 +10,7 @@
 #include "IRenderable.h"
 #include "OpenGL3DDataObject.h"
 
+struct Texture;
 class Model;
 
 class Renderer {
@@ -23,6 +24,7 @@ class Renderer {
     void Render();
     void AddRenderable(std::unique_ptr<IRenderable> spRenderObject);
     void RemoveRenderable(const std::string& rName);
+    void UpdateTexture(const std::string& rName, const Texture* pTexture);
 
    private:
     std::vector<RenderData> _renderData;
