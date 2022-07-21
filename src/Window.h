@@ -28,6 +28,8 @@ class Window {
         _lastDirection = Eigen::Vector3f(0.f, 0.f, 0.f);
         return tmp;
     }
+
+    Eigen::Vector2d GetCursorPostionDelta();
     static void WindowResizeCallback(GLFWwindow* win, int h, int w);
     static void MouseInputCallback(GLFWwindow* win, int button, int action, int mods);
     static void MouseWheelCallback(GLFWwindow* win, double xoffset, double yoffset);
@@ -48,6 +50,9 @@ class Window {
 
    public:
     Eigen::Vector3f _lastDirection = Eigen::Vector3f(0.f, 0.f, 0.f);
+    Eigen::Vector2d _lastCursorPostion;
+    Eigen::Vector2d _deltaCursorPosition;
+    bool _updateMousePostion = false;
     const std::string _windowName;
     int _winHeight;
     int _winWidth;

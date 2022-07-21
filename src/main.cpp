@@ -1,23 +1,14 @@
-#include "File.h"
-#include "Image.h"
-#include "ImageViewer.h"
-#include "VideoStream.h"
+#include "Viewer3D.h"
 
 int main() {
-    auto viewer = ImageViewer("ImageViewer Window");
-    File file = File("output.mp4", File::FileType::Video);
+    auto viewer = Viewer3D("My Window");
 
     if (viewer.Init() < 0) {
         return -1;
     }
 
-    VideoStream stream;
-    stream.Open(file);
-    while (stream.IsOpen()) {
-        Image img;
-        stream >> img;
-        viewer.ShowImage(img);
-    }
+    viewer.SetBackgroundColor(Eigen::Vector4f(0.1f, 0.2f, .5f, 1.f));
+    viewer.Run();
 
     return 0;
 }

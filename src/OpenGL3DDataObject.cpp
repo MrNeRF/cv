@@ -69,7 +69,7 @@ void OpenGL3DDataObject::InitializeTextureBuffer(Texture* pTexture) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Here is a hack for a greyscale picture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, pTexture->_width, pTexture->_height, 0, GL_RED, GL_UNSIGNED_BYTE, pTexture->_pData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pTexture->_width, pTexture->_height, 0, GL_RGB, GL_UNSIGNED_BYTE, pTexture->_pData);
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 

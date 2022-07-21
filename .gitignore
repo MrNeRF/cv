@@ -3,3 +3,4 @@ build
 .idea
 lib
 include
+*.mp4

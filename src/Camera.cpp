@@ -1,8 +1,17 @@
 #include "Camera.h"
 #include <Logger.h>
 #include <cmath>
+#include <numbers>
 
 static Eigen::Matrix4f ComputeFrustum(float left, float right, float bottom, float top, float near, float far);
+
+template <typename T>
+int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}
+
+static float maxRotateRadPerSec = std::numbers::pi_v<float>;
+static float epsilon = 0.001f;
 
 const Eigen::Matrix4f& Camera::GetLookAt() const {
     // Right Hand Coordinate System
@@ -44,6 +53,32 @@ void Camera::UpdateOrientation(const Eigen::AngleAxisf& angleAxis) {
     _eye.x() = tmp.x();
     _eye.y() = tmp.y();
     _eye.z() = tmp.z();
+}
+
+void Camera::UpdateCameraPosition(Eigen::Vector2d deltaCursorPos, double delta_time) {
+    static const float sensitivity = 1.5f;
+
+    const float maxRotRadPerTimeInstance = delta_time * maxRotateRadPerSec * sensitivity;
+    const float rad_y = std::atan2(_eye.y(), _eye.x());
+    if (deltaCursorPos.y() != 0.f && (rad_y < std::numbers::pi_v<float> || rad_y > -std::numbers::pi_v<float>)) {
+        const Eigen::Vector3f camDir = (_eye - _target).normalized();
+        const Eigen::Vector3f camRight = (_up.cross(camDir)).normalized();
+        const float sign = sgn(deltaCursorPos.y());
+        float maxRotRad = 0.f;
+        if (sign < 0.f) {
+            maxRotRad = -std::numbers::pi_v<float> + maxRotRadPerTimeInstance < rad_y ? -maxRotRadPerTimeInstance : -std::numbers::pi_v<float> - rad_y + epsilon;
+        } else {
+            maxRotRad = std::numbers::pi_v<float> - maxRotRadPerTimeInstance > rad_y ? maxRotRadPerTimeInstance : std::numbers::pi_v<float> - rad_y - epsilon;
+        }
+
+        Eigen::Affine3f rot_pitch(Eigen::AngleAxis<float>(-maxRotRad, camRight));
+        _eye = rot_pitch * _eye;
+    }
+
+    if (deltaCursorPos.x() != 0) {
+        Eigen::Affine3f rot_yaw(Eigen::AngleAxis<float>(maxRotRadPerTimeInstance * -sgn(deltaCursorPos.x()), Eigen::Vector3f::UnitY()));
+        _eye = rot_yaw * _eye;
+    }
 }
 
 Eigen::Matrix4f ComputeFrustum(float left, float right, float bottom, float top, float near, float far) {

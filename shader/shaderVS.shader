@@ -41,11 +41,11 @@ vec3 rotate_vertex_position(vec3 position, vec4 qr, vec4 qr_conj)
 
 void main()
 {
-    vec3 pos = rotate_vertex_position(vertPosIn, transform.qOrientation.xyzw, transform.qconjOrientation.xyzw);
-    pos += transform.position.xyz;
+    //vec3 pos = rotate_vertex_position(vertPosIn, transform.qOrientation.xyzw, transform.qconjOrientation.xyzw);
+    //pos += transform.position.xyz;
     uv = uvIn;
     vertexNormal = transpose(inverse(normalRotationMatrix)) * vertNormalIn;
     
-    gl_Position = projection * view  * vec4(pos, 1.f);
-    vertexWorldPosition = pos;
+    vertexWorldPosition = vertPosIn;
+    gl_Position = projection * view  * vec4(vertPosIn, 1.f);
 }

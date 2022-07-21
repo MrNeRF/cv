@@ -5,8 +5,8 @@
 #include "Light.h"
 #include "Logger.h"
 #include "Material.h"
+#include <chrono>
 #include "PhongShader.h"
-#include "Window.h"
 
 int Viewer3D::Init(void) {
     _spCamera = std::make_shared<Camera>();
@@ -39,22 +39,28 @@ void Viewer3D::Run(void) {
 // RenderLoop
 void Viewer3D::render() {
 
+    uint32_t fps = 60;
     CHECK_GL_ERROR_(glClearColor(_backgroundColor.x() * _backgroundColor.w(),
                                  _backgroundColor.y() * _backgroundColor.w(),
                                  _backgroundColor.z() * _backgroundColor.w(),
                                  _backgroundColor.w()));
-    CHECK_GL_ERROR_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
 
     CHECK_GL_ERROR_(glDepthFunc(GL_LESS))
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    // UpdatePositions
-    _spCamera->UpdateCameraPosition(_spWindow->GetLastDirection());
-    // Draw
-    _renderer.Render();
-    glfwSwapBuffers(_spWindow->GetGLFWWindow());
-
     while (!glfwWindowShouldClose(_spWindow->GetGLFWWindow())) {
+        auto t1 = std::chrono::high_resolution_clock().now();
+        CHECK_GL_ERROR_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
+
+        // UpdatePositions
+        _spCamera->UpdateCameraPosition(_spWindow->GetCursorPostionDelta(), 1. / static_cast<double>(fps));
+        // Draw
+        _renderer.Render();
+        glfwSwapBuffers(_spWindow->GetGLFWWindow());
+
         glfwPollEvents();
+        auto t2 = std::chrono::high_resolution_clock().now();
+        auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+        fps = static_cast<uint32_t>(1000L / std::max(time_elapsed, 1L));
+        std::cout << fps << "\n";
     }
 }

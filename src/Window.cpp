@@ -139,6 +139,7 @@ int Window::Init() {
     glfwSetScrollCallback(_windowInstance, MouseWheelCallback);
     glfwSetCursorPosCallback(_windowInstance, CursorPositionCallback);
     glfwSetKeyCallback(_windowInstance, KeyboardCallback);
+    glfwGetCursorPos(_windowInstance, _lastCursorPostion.data(), _lastCursorPostion.data() + 1);
     return 0;
 }
 
@@ -182,12 +183,16 @@ void Window::KeyboardCallback(GLFWwindow* win, int key, int scancode, int action
 }
 
 void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods) {
+    if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_MIDDLE) {
+        _updateMousePostion = true;
+    }
+    else if (action == GLFW_REPEAT && button == GLFW_MOUSE_BUTTON_MIDDLE) {
+    } else {
+        _updateMousePostion = false;
+    }
 }
 
 void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods) {
-    if (action == GLFW_PRESS) {
-    } else if (action == GLFW_RELEASE) {
-    }
 
     _key = key;
 
@@ -216,4 +221,17 @@ void Window::MouseWheelUpdate(double xoffset, double yoffset) {
 }
 
 void Window::CursorPositionUpdate(double xCursorPos, double yCursorPos) {
+    auto currentCursorPosition = Eigen::Vector2d(xCursorPos, yCursorPos);
+    _deltaCursorPosition = currentCursorPosition - _lastCursorPostion;
+    _lastCursorPostion = currentCursorPosition;
+}
+
+Eigen::Vector2d Window::GetCursorPostionDelta() {
+    if (_updateMousePostion) {
+        auto deltaCursorPos = _deltaCursorPosition;
+        _deltaCursorPosition = Eigen::Vector2d(0., 0.);
+        return deltaCursorPos;
+    } else {
+        return Eigen::Vector2d(0., 0.);
+    }
 }

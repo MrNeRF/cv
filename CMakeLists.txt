@@ -41,7 +41,7 @@ set(MY_EXECUTABLE_SOURCES
     src/main.cpp
     src/Image.cpp
     src/ImageCanvas.cpp
-    src/ImageViewer.cpp
+#    src/ImageViewer.cpp
     src/Importer.cpp
     src/Model.cpp
     src/ObjFileParser.cpp
@@ -51,7 +51,7 @@ set(MY_EXECUTABLE_SOURCES
     src/Shader.cpp
     src/stb_image.cpp
     src/Texture.cpp
-    src/VideoStream.cpp
+#    src/VideoStream.cpp
     src/Viewer3D.cpp
     src/Window.cpp)
 
@@ -71,22 +71,22 @@ target_compile_options(
           -D_GLIBCXX_DEBUG)
 
 
-add_library(libavcodec STATIC IMPORTED)
-set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavcodec.a)
-set_target_properties(libavcodec PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
+#add_library(libavcodec STATIC IMPORTED)
+#set_target_properties(libavcodec PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavcodec.a)
+#set_target_properties(libavcodec PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
 
-add_library(libavutil STATIC IMPORTED)
-set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavutil.a)
-set_target_properties(libavutil PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
-add_library(libavformat STATIC IMPORTED)
-set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavformat.a)
-set_target_properties(libavformat PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
+#add_library(libavutil STATIC IMPORTED)
+#set_target_properties(libavutil PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavutil.a)
+#set_target_properties(libavutil PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
+#add_library(libavformat STATIC IMPORTED)
+#set_target_properties(libavformat PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libavformat.a)
+#set_target_properties(libavformat PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
 #add_library(libswscale STATIC IMPORTED)
 #set_target_properties(libswscale PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libswscale.a)
 #set_target_properties(libswscale PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
-add_library(libswresample STATIC IMPORTED)
-set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libswscale.a)
-set_target_properties(libswresample PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
+#add_library(libswresample STATIC IMPORTED)
+#set_target_properties(libswresample PROPERTIES IMPORTED_LOCATION /home/paja/projects/cv/lib/libswscale.a)
+#set_target_properties(libswresample PROPERTIES INTERFACE_INCLUDE_DIRECTORIES /home/paja/projects/cv/include)
 
 target_link_libraries(
   cv
@@ -98,13 +98,13 @@ target_link_libraries(
           -lGLU
           -lGL
           ${GLFW3_LIBRARY}
-        -lavcodec
-        -llzma
-        -lz
-        -lswresample
-        -lavutil
-        -lavformat
-        -lm
-        -latomic
-        -lz
+#        -lavcodec
+#        -llzma
+#        -lz
+#        -lswresample
+#        -lavutil
+#        -lavformat
+#        -lm
+#        -latomic
+#        -lz
 )
