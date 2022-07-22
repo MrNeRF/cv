@@ -10,8 +10,8 @@
 #include "Material.h"
 #include "Model.h"
 
-static const std::filesystem::path fragmentShaderName = "shaderFS.shader";
-static const std::filesystem::path vertexShaderName = "shaderVS.shader";
+static const std::filesystem::path fragmentShaderName = "PhongFS.shader";
+static const std::filesystem::path vertexShaderName = "PhongVS.shader";
 static const std::string shaderName = "PhongShader";
 
 PhongShader::PhongShader() : Shader(shaderName) {
@@ -22,11 +22,12 @@ PhongShader::PhongShader() : Shader(shaderName) {
 
 void PhongShader::SetMaterial(const Material& rMaterial) {
     Shader::activateShader();
-    _spMaterial = std::make_unique<Material>(rMaterial);
-    SetVector("Material.ambient", _spMaterial->GetAmbient());
-    SetVector("Material.diffuse", _spMaterial->GetDiffuse());
-    SetVector("Material.specular", _spMaterial->GetSpecular());
-    SetValue("Material.shininess", _spMaterial->GetShininess());
+    _spMaterial = std::make_unique<Material>();
+    // Pro tip: watch out upper/lower case (e.g. same as instance of struct in shader)
+    SetVector("material.ambient", _spMaterial->GetAmbient());
+    SetVector("material.diffuse", _spMaterial->GetAmbient());
+    SetVector("material.specular", _spMaterial->GetSpecular());
+    SetValue("material.shininess", _spMaterial->GetShininess());
 }
 
 void PhongShader::SetLightSource(std::shared_ptr<Light> spLight) {

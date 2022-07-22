@@ -61,6 +61,5 @@ void Viewer3D::render() {
         auto t2 = std::chrono::high_resolution_clock().now();
         auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
         fps = static_cast<uint32_t>(1000L / std::max(time_elapsed, 1L));
-        std::cout << fps << "\n";
     }
 }

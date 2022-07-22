@@ -28,6 +28,6 @@ class Light {
     Eigen::Vector3f _ambient{.5f, .5f, .5f};
     Eigen::Vector3f _diffuse{.2f, .2f, .2f};
     Eigen::Vector3f _specular{.2f, .2f, .2f};
-    Eigen::Vector4f _position{1.f, 1.f, 1.f, 1.f};
+    Eigen::Vector4f _position{1.f, 2.f, 6.f, 1.f};
 };
 #endif  // CV_LIGHT_H
