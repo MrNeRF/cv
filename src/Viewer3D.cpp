@@ -18,6 +18,7 @@ void Viewer3D::Run(void) {
     auto& rLogger = Logger::GetInstance().GetLogger();
     rLogger.info("Viewer3D::Run()");
 
+    /* auto spModel = Importer::ImportModel("LibertyStatue/LibertStatue.obj"); */
     auto spModel = Importer::ImportModel("dice.obj");
     auto spPhongShader = std::make_unique<PhongShader>();
 

@@ -19,8 +19,8 @@ static std::string fileTypeFolderMapping(File::FileType fileType) {
 }
 
 File::File(const std::string& fileName, const FileType fileType)
-    : inputPath{std::filesystem::current_path().parent_path().string() + "/" + fileTypeFolderMapping(fileType) + "/" + fileName} {
-    if (is_empty(inputPath) || !exists(inputPath)) {
+    : _inputPath{std::filesystem::current_path().parent_path().string() + "/" + fileTypeFolderMapping(fileType) + "/" + fileName} {
+    if (is_empty(_inputPath) || !exists(_inputPath)) {
         std::cerr << "Error! No filename provided!\n";
         return;
     }
@@ -30,24 +30,24 @@ std::string File::GetContents() const {
     std::ifstream fileReader;
     fileReader.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try {
-        fileReader.open(inputPath.c_str());
+        fileReader.open(_inputPath.c_str());
         std::stringstream ss;
         ss << fileReader.rdbuf();
         fileReader.close();
         return ss.str();
     } catch (const std::ifstream::failure& e) {
-        std::cerr << fmt::format("ERROR: File {} not successfully read!\n", inputPath.string());
+        std::cerr << fmt::format("ERROR: File {} not successfully read!\n", _inputPath.string());
         return "";
     }
 }
 
 const std::filesystem::path File::GetFilePath() const {
-    return inputPath;
+    return _inputPath;
 }
 
 std::vector<std::string> File::GetDirectoryContents() const {
     std::vector<std::string> filenames;
-    for (const auto& rFile : std::filesystem::directory_iterator(inputPath)) {
+    for (const auto& rFile : std::filesystem::directory_iterator(_inputPath)) {
         std::string filename = rFile.path().stem();
         if (std::find(filenames.begin(), filenames.end(), filename) == filenames.end()) {
             filenames.push_back(filename);
@@ -57,8 +57,8 @@ std::vector<std::string> File::GetDirectoryContents() const {
 }
 
 std::string File::GetFileEnding() const {
-    return inputPath.extension().string();
+    return _inputPath.extension().string();
 }
 std::string File::GetFileName() const {
-    return inputPath.stem();
+    return _inputPath.stem();
 }
