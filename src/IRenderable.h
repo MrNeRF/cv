@@ -15,7 +15,6 @@ class IRenderable {
     virtual ~IRenderable() = default;
 
     virtual void SetShader(std::unique_ptr<Shader> spShader) = 0;
-    virtual void SetTexture(std::unique_ptr<Texture> spTexture) = 0;
     virtual void Render() = 0;
     virtual Mesh* GetMesh() = 0;
     virtual Texture* GetTexture() = 0;

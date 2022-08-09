@@ -24,10 +24,10 @@ void PhongShader::SetMaterial(const Material& rMaterial) {
     Shader::activateShader();
     _spMaterial = std::make_unique<Material>();
     // Pro tip: watch out upper/lower case (e.g. same as instance of struct in shader)
-    SetVector("material.ambient", _spMaterial->GetAmbient());
-    SetVector("material.diffuse", _spMaterial->GetAmbient());
-    SetVector("material.specular", _spMaterial->GetSpecular());
-    SetValue("material.shininess", _spMaterial->GetShininess());
+    SetVector("material.ambient", _spMaterial->ambient);
+    SetVector("material.diffuse", _spMaterial->diffuse);
+    SetVector("material.specular", _spMaterial->specular);
+    SetValue("material.specularExponent", _spMaterial->specularExponent);
 }
 
 void PhongShader::SetLightSource(std::shared_ptr<Light> spLight) {

@@ -24,7 +24,6 @@ std::unique_ptr<IRenderable> Importer::ImportModel(const std::string& pathToMesh
     if (!IsFileFormatSupport(meshFile.GetFileEnding())) {
         return nullptr;
     }
-    std::unique_ptr<Model> spRenderable = std::make_unique<Model>(ObjFileParser::GetMesh(meshFile), meshFile.GetFileName());
-    spRenderable->SetTexture(ObjFileParser::GetTexture(meshFile));
+    std::unique_ptr<Model> spRenderable = ObjFileParser::ImportModel(meshFile);
     return spRenderable;
 }

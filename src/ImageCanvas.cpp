@@ -57,47 +57,38 @@ Eigen::Vector2f lowerRightUV = {1.f, 0.f};
 // faces(j, 4) = uv.y();
 
 ImageCanvas::ImageCanvas() {
-    auto canvas = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit>(6, 5);
-    canvas(Triangle::FIRST_CORNER_A, COOR_X) = upperLeftCorner.x();
-    canvas(Triangle::FIRST_CORNER_A, COOR_Y) = upperLeftCorner.y();
-    canvas(Triangle::FIRST_CORNER_A, COOR_Z) = upperLeftCorner.z();
-    canvas(Triangle::FIRST_CORNER_A, COOR_U) = upperLeftUV.x();
-    canvas(Triangle::FIRST_CORNER_A, COOR_V) = upperLeftUV.y();
-
-    canvas(Triangle::FIRST_CORNER_B, COOR_X) = upperRightCorner.x();
-    canvas(Triangle::FIRST_CORNER_B, COOR_Y) = upperRightCorner.y();
-    canvas(Triangle::FIRST_CORNER_B, COOR_Z) = upperRightCorner.z();
-    canvas(Triangle::FIRST_CORNER_B, COOR_U) = upperRightUV.x();
-    canvas(Triangle::FIRST_CORNER_B, COOR_V) = upperRightUV.y();
-
-    canvas(Triangle::FIRST_CORNER_C, COOR_X) = lowerLeftCorner.x();
-    canvas(Triangle::FIRST_CORNER_C, COOR_Y) = lowerLeftCorner.y();
-    canvas(Triangle::FIRST_CORNER_C, COOR_Z) = lowerLeftCorner.z();
-    canvas(Triangle::FIRST_CORNER_C, COOR_U) = lowerLeftUV.x();
-    canvas(Triangle::FIRST_CORNER_C, COOR_V) = lowerLeftUV.y();
-
-    canvas(Triangle::SECOND_CORNER_A, COOR_X) = upperRightCorner.x();
-    canvas(Triangle::SECOND_CORNER_A, COOR_Y) = upperRightCorner.y();
-    canvas(Triangle::SECOND_CORNER_A, COOR_Z) = upperRightCorner.z();
-    canvas(Triangle::SECOND_CORNER_A, COOR_U) = upperRightUV.x();
-    canvas(Triangle::SECOND_CORNER_A, COOR_V) = upperRightUV.y();
-
-    canvas(Triangle::SECOND_CORNER_B, COOR_X) = lowerRightCorner.x();
-    canvas(Triangle::SECOND_CORNER_B, COOR_Y) = lowerRightCorner.y();
-    canvas(Triangle::SECOND_CORNER_B, COOR_Z) = lowerRightCorner.z();
-    canvas(Triangle::SECOND_CORNER_B, COOR_U) = lowerRightUV.x();
-    canvas(Triangle::SECOND_CORNER_B, COOR_V) = lowerRightUV.y();
-
-    canvas(Triangle::SECOND_CORNER_C, COOR_X) = lowerLeftCorner.x();
-    canvas(Triangle::SECOND_CORNER_C, COOR_Y) = lowerLeftCorner.y();
-    canvas(Triangle::SECOND_CORNER_C, COOR_Z) = lowerLeftCorner.z();
-    canvas(Triangle::SECOND_CORNER_C, COOR_U) = lowerLeftUV.x();
-    canvas(Triangle::SECOND_CORNER_C, COOR_V) = lowerLeftUV.y();
 
     _spMesh = std::make_unique<Mesh>();
-    _spMesh->faces = canvas;
+    _spMesh->vertices.reserve(6);
     _spMesh->bHasUVs = true;
     _spMesh->bHasNormals = false;
+
+    Vertex v0, v1, v2, v3, v4, v5;
+
+    v0.position = upperLeftCorner;
+    v0.uv = upperLeftUV;
+
+    v1.position = upperRightCorner;
+    v1.uv = upperRightUV;
+
+    v2.position = lowerLeftCorner;
+    v2.uv = lowerLeftUV;
+
+    v3.position = upperRightCorner;
+    v3.uv = upperRightUV;
+
+    v4.position = lowerRightCorner;
+    v4.uv = lowerRightUV;
+
+    v5.position = lowerLeftCorner;
+    v5.uv = lowerLeftUV;
+
+    _spMesh->vertices.push_back(v0);
+    _spMesh->vertices.push_back(v1);
+    _spMesh->vertices.push_back(v2);
+    _spMesh->vertices.push_back(v3);
+    _spMesh->vertices.push_back(v4);
+    _spMesh->vertices.push_back(v5);
 }
 void ImageCanvas::Render() {
     ASSERT(_spShader != nullptr);

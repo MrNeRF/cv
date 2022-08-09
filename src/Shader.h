@@ -28,6 +28,7 @@ class Shader {
     explicit Shader(const std::string& name)
         : _shaderName(name){};
 
+    virtual ~Shader() = default;
     virtual void ActivateShader(const IRenderable* pRenderObject) = 0;
     unsigned int GetShaderProgramID(void) { return _shaderProgramID; };
 

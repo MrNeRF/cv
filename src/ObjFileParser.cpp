@@ -1,12 +1,62 @@
 #include "ObjFileParser.h"
 #include <functional>
+#include <numeric>
 #include <unordered_map>
 #include "Logger.h"
 #include "Macros.h"
+#include "Material.h"
+#include "Model.h"
 #include "Mesh.h"
 #include "Texture.h"
 
-const static std::unordered_map<std::string, uint8_t> objSymbolsMapping{{"v", 'v'}, {"vt", 't'}, {"vn", 'n'}, {"f", 'f'}, {"s", 's'}, {"o", 'o'}, {"mtllib", 'm'}, {"usemtl", 'u'}, {"g", 'g'}, {"#", '#'}};
+enum class ObjFormatSymbols {
+    vertexPosition,
+    uv,
+    normal,
+    face,
+    smoothShading,
+    objectName,
+    groupName,
+    materialLib,
+    useMaterial,
+    comment
+};
+
+enum class MaterialObjLibSymbols {
+    newMaterial,
+    specularExponent,
+    ambientColor,
+    diffuseColor,
+    specularColor,
+    ke_dontKnow,
+    opticalDensity,
+    alphaValue,
+    textureName,
+    comment
+};
+
+static std::unordered_map<std::string, ObjFormatSymbols> objSymbolsMapping{{"v", ObjFormatSymbols::vertexPosition},
+                                                                           {"vt", ObjFormatSymbols::uv},
+                                                                           {"vn", ObjFormatSymbols::normal},
+                                                                           {"f", ObjFormatSymbols::face},
+                                                                           {"s", ObjFormatSymbols::smoothShading},
+                                                                           {"o", ObjFormatSymbols::objectName},
+                                                                           {"mtllib", ObjFormatSymbols::materialLib},
+                                                                           {"usemtl", ObjFormatSymbols::useMaterial},
+                                                                           {"g", ObjFormatSymbols::groupName},
+                                                                           {"#", ObjFormatSymbols::comment}};
+
+static std::unordered_map<std::string, MaterialObjLibSymbols> materialLibSymbolMapping{{"newmtl", MaterialObjLibSymbols::newMaterial},
+                                                                                       {"Ns", MaterialObjLibSymbols::specularExponent},
+                                                                                       {"Ka", MaterialObjLibSymbols::ambientColor},
+                                                                                       {"Kd", MaterialObjLibSymbols::diffuseColor},
+                                                                                       {"Ks", MaterialObjLibSymbols::specularColor},
+                                                                                       {"Ke", MaterialObjLibSymbols::ke_dontKnow},
+                                                                                       {"Ni", MaterialObjLibSymbols::opticalDensity},
+                                                                                       {"d", MaterialObjLibSymbols::alphaValue},
+                                                                                       {"map_Kd", MaterialObjLibSymbols::textureName},
+                                                                                       {"#", MaterialObjLibSymbols::comment}};
+
 enum class FaceFormat {
     undefined,  // None set
     v_vt,       // vertex, uv
@@ -15,52 +65,11 @@ enum class FaceFormat {
     v_v_v       // vertex, vertex, vertex
 };
 
-std::pair<uint8_t, uint8_t> findSymbol(const std::string& line) {
-    int start = 0;
-    int end = 0;
-    std::string symbol;
-    uint8_t index = 0;
-    for (const auto& c : line) {
-        if (c != ' ') {
-            symbol += c;
-            ++index;
-        } else {
-            ++index;
-            break;
-        }
-    }
-
-    auto mappedSymbol = objSymbolsMapping[symbol];
-    return std::make_pair(mappedSymbol, index);
-}
-
-std::pair<std::vector<uint32_t>, FAceFormat> extractIndices(const std::string& line, uint8_t index) {
-    uint32_t strLen = static_cast<uint8_t>(line.size());
-    std::vector<uint32_t> indices;
-    std::string indexString;
-    uint8_t slashCounter = 0;
-    FaceFormat fFormat = FaceFormat::undefined;
-    for (uint8_t i = index; i < strLen; ++i) {
-        if (line[i] == ' ' || (line[i] == '\n') {
-            slashCounter = 0;
-            indexString = "";
-            continue;
-        } else if (line[i] == '\\' && line[i + 1] == '\\') {
-            // case double slash
-            fFormat = FaceFormat::v_vn;
-            indices.push_back(std::stoi(indexString));
-            indexString = "" ++i;
-        } else if (line[i] == '\\' && line[i + 1] != '\\') {
-            // case single slash
-            ++slashCounter;
-            fFormat = slashCounter == 1 ? FaceFormat::v_vt : FaceFormat::v_vt_vn;
-            indices.push_back(std::stoi(indexString));
-            indexString = "" ++i;
-        } else {
-            indexString += line[i];
-        }
-    }
-}
+struct VertexIndices {
+    uint32_t v_index = std::numeric_limits<uint32_t>::max();
+    uint32_t vt_index = std::numeric_limits<uint32_t>::max();
+    uint32_t vn_index = std::numeric_limits<uint32_t>::max();
+};
 
 static void tokenize(const std::string& line, char delim, std::vector<std::string>& tokens) {
 
@@ -75,95 +84,232 @@ static void tokenize(const std::string& line, char delim, std::vector<std::strin
     }
 }
 
-std::unique_ptr<Mesh> ObjFileParser::GetMesh(const File& rRawData) {
+static std::unique_ptr<Material> importMaterial(const std::string materialFileName) {
+    auto materialFile = File(materialFileName, File::FileType::Model);
+    const std::string buffer = materialFile.GetContents();
+    std::istringstream iss(buffer);
+    std::unique_ptr<Material> spMaterial = std::make_unique<Material>();
+    for (std::string line; std::getline(iss, line);) {
+        std::vector<std::string> tokens;
+        tokenize(line, ' ', tokens);
+        const auto symbol = materialLibSymbolMapping[tokens[0]];
+        switch (symbol) {
+        case MaterialObjLibSymbols::newMaterial:
+            break;
+        case MaterialObjLibSymbols::specularExponent:
+            spMaterial->specularExponent = std::stof(tokens[1]);
+            break;
+        case MaterialObjLibSymbols::ambientColor:
+            spMaterial->ambient = {std::stof(tokens[1]), std::stof(tokens[2]),std::stof(tokens[3])};
+            break;
+        case MaterialObjLibSymbols::diffuseColor:
+            spMaterial->diffuse = {std::stof(tokens[1]), std::stof(tokens[2]),std::stof(tokens[3])};
+            break;
+        case MaterialObjLibSymbols::specularColor:
+            spMaterial->specular = {std::stof(tokens[1]), std::stof(tokens[2]),std::stof(tokens[3])};
+            break;
+        case MaterialObjLibSymbols::ke_dontKnow:
+            break;
+        case MaterialObjLibSymbols::opticalDensity:
+            break;
+        case MaterialObjLibSymbols::alphaValue:
+            break;
+        case MaterialObjLibSymbols::textureName:
+            spMaterial->spTexure = std::make_unique<Texture>(File(tokens.at(1), File::FileType::Model));
+            break;
+        case MaterialObjLibSymbols::comment:
+            break;
+        default:
+            ASSERT(0)
+            // not implemented
+        }
+    }
+
+    return spMaterial;
+}
+
+std::pair<std::vector<VertexIndices>, FaceFormat> extractIndices(const std::vector<std::string>& rTokens) {
+    std::vector<uint32_t> indices;
+    std::string indexString;
+    FaceFormat faceFormat = FaceFormat::undefined;
+    std::vector<VertexIndices> vertexIndices;
+    for (const auto& rToken : rTokens) {
+        if (rToken == "f") {
+            continue;
+        }
+        uint32_t numberOfSlashes = 0;
+        indexString = "";
+        for (size_t idx = 0; idx < rToken.size(); ++idx) {
+            const char currentChar = rToken[idx];
+            if (currentChar == '/') {
+                const char secondChar = rToken[idx + 1];
+                faceFormat = secondChar == '/' ? FaceFormat::v_vn : numberOfSlashes++ == 1 ? FaceFormat::v_vt
+                                                                                           : FaceFormat::v_vt_vn;
+                // advance one index because of double slash
+                idx = secondChar == '/' ? idx + 1 : idx;
+                // shift index by -1 (obj starting from 1)
+                indices.push_back(std::stoi(indexString) - 1);
+                indexString = "";
+
+            } else {
+                indexString += currentChar;
+            }
+        }
+        // take last index and shift index by -1 (obj starting from 1)
+        indices.push_back(std::stoi(indexString) - 1);
+        faceFormat = faceFormat == FaceFormat::v_vn ? FaceFormat::v_vn : numberOfSlashes == 2 ? FaceFormat::v_vt_vn
+                                                                                              : FaceFormat::v_vt;
+
+        switch (faceFormat) {
+        case FaceFormat::undefined:  // None set
+            break;
+        case FaceFormat::v_vt:  // vertex, uv
+            vertexIndices.push_back(VertexIndices{.v_index = indices[0], .vt_index = indices[1]});
+            break;
+        case FaceFormat::v_vn:  // vertex, normal
+            vertexIndices.push_back(VertexIndices{.v_index = indices[0], .vn_index = indices[1]});
+            break;
+        case FaceFormat::v_vt_vn:  // vertex, uv, normal
+            vertexIndices.push_back(VertexIndices{.v_index = indices[0], .vt_index = indices[1], .vn_index = indices[2]});
+            break;
+        case FaceFormat::v_v_v:  // vertex, vertex, vertex
+            for (size_t idx = 0; idx < 3; ++idx) {
+                vertexIndices.push_back(VertexIndices{.v_index = indices[idx]});
+            }
+            break;
+        default:
+            ASSERT(0);
+        }
+        indices.clear();
+    }
+
+    return std::make_pair(vertexIndices, faceFormat);
+}
+
+std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
     const std::string buffer = rRawData.GetContents();
+    std::unique_ptr<Model> spModel = std::make_unique<Model>();
     std::unique_ptr<Mesh> spMesh = std::make_unique<Mesh>();
     std::istringstream iss(buffer);
 
     std::vector<Eigen::Vector3f> vertices;
     std::vector<Eigen::Vector2f> uvs;
     std::vector<Eigen::Vector3f> normals;
-    std::vector<uint32_t> indices;
 
     for (std::string line; std::getline(iss, line);) {
         std::vector<std::string> tokens;
         tokenize(line, ' ', tokens);
 
-        auto [symbol, index] = findSymbol(line);
+        const auto symbol = objSymbolsMapping[tokens[0]];
         switch (symbol) {
-        case 'v':
+        case ObjFormatSymbols::vertexPosition:
             vertices.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3)));
-        case 't':
+            break;
+        case ObjFormatSymbols::uv:
             uvs.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)));
-        case 'n':
+            break;
+        case ObjFormatSymbols::normal:
             normals.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3)));
-        case 'f':
-            auto [tokenizedIndices, fFormat] = extractIndices(line, index);
-            // Here we have to distinguish the cases. It is of utmost importance to distinguish quads, etc.
-
+            break;
+        case ObjFormatSymbols::materialLib:
+            spModel->SetMaterial(importMaterial(tokens[1]));
+            break;
+        case ObjFormatSymbols::useMaterial:
+            break;
+        case ObjFormatSymbols::comment:
+            // Comment. Skip!
+            break;
+        case ObjFormatSymbols::groupName:
+            break;
+        case ObjFormatSymbols::objectName:
+            spModel->SetName(tokens[0]);
+            break;
+        case ObjFormatSymbols::smoothShading:
+            break;
+        case ObjFormatSymbols::face: {
+            auto [vertexIndices, fFormat] = extractIndices(tokens);
+            if (vertexIndices.size() == 3) {
+                for (const auto& rVertexIndex : vertexIndices) {
+                    Vertex vertex;
+                    vertex.position = vertices[rVertexIndex.v_index];
+                    switch (fFormat) {
+                    case FaceFormat::undefined:
+                        break;
+                    case FaceFormat::v_vt:
+                        vertex.uv = uvs[rVertexIndex.vt_index];
+                        spMesh->bHasUVs = true;
+                        break;
+                    case FaceFormat::v_vn:
+                        vertex.normal = normals[rVertexIndex.vn_index];
+                        spMesh->bHasNormals = true;
+                        break;
+                    case FaceFormat::v_vt_vn:
+                        vertex.uv = uvs[rVertexIndex.vt_index];
+                        vertex.normal = normals[rVertexIndex.vn_index];
+                        spMesh->bHasNormals = true;
+                        spMesh->bHasUVs = true;
+                        break;
+                    case FaceFormat::v_v_v:
+                        break;
+                    }
+                    spMesh->vertices.push_back(vertex);
+                }
+            } else if (vertexIndices.size() == 4) {
+                // split quad into two triangles via indices
+                std::array<uint32_t, 6> vertexIndex{0, 1, 3, 1, 2, 3};  // First triangle: 0,1,3; second triangle: 1,2,3
+                switch (fFormat) {
+                case FaceFormat::undefined:
+                    break;
+                case FaceFormat::v_vt:
+                    for (const uint32_t idx : vertexIndex) {
+                        Vertex vertex;
+                        vertex.position = vertices[idx];
+                        vertex.uv = uvs[idx];
+                        spMesh->vertices.push_back(vertex);
+                        spMesh->bHasUVs = true;
+                    }
+                    break;
+                case FaceFormat::v_vn:
+                    for (const uint32_t idx : vertexIndex) {
+                        Vertex vertex;
+                        vertex.position = vertices[idx];
+                        vertex.normal = normals[idx];
+                        spMesh->vertices.push_back(vertex);
+                        spMesh->bHasNormals = true;
+                    }
+                    break;
+                case FaceFormat::v_vt_vn:
+                    for (const uint32_t idx : vertexIndex) {
+                        Vertex vertex;
+                        vertex.position = vertices[idx];
+                        vertex.uv = uvs[idx];
+                        vertex.normal = normals[idx];
+                        spMesh->vertices.push_back(vertex);
+                        spMesh->bHasNormals = true;
+                        spMesh->bHasUVs = true;
+                    }
+                    break;
+                case FaceFormat::v_v_v:
+                    for (const uint32_t idx : vertexIndex) {
+                        Vertex vertex;
+                        vertex.position = vertices[idx];
+                        spMesh->vertices.push_back(vertex);
+                    }
+                    break;
+                }
+            } else {
+                ASSERT(0);
+            }
+            break;
+        }
         default:
+            Logger::GetInstance().GetLogger().info("{}: Token {} not implemented",
+                                                   rRawData.GetFilePath().filename().string(),
+                                                   tokens[0]);
+            continue;
+            break;
             // skip for now
         }
-        if (tokens.at(0).compare("v") == 0) {  // Vertex
-            vertices.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3)));
-        } else if (tokens.at(0).compare("vt") == 0) {  // Texture
-            uvs.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)));
-        } else if (tokens.at(0).compare("vn") == 0) {  // normals;
-            normals.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3)));
-        } else if (tokens.at(0).compare("f") == 0 && tokens.size() == 4) {  // faces
-            // start of face index enumeration.
-            std::vector<std::string> subTokens;
-            subTokens.reserve(3);
-            for (int i = 0; i < 3; ++i) {
-                tokenize(tokens.at(i + 1), '/', subTokens);
-                // Indices start at 1 that is why we have to subtract 1
-                // format is: vertex, uv, normal
-                indices.emplace_back(std::stoi(subTokens[0]) - 1);
-                indices.emplace_back(std::stoi(subTokens[1]) - 1);
-                indices.emplace_back(std::stoi(subTokens[2]) - 1);
-                subTokens.clear();
-            }
-        } else if (tokens.at(0).compare("f") == 0 && tokens.size() == 5) {  // faces
-            // Quads  => TODO
-            std::vector<std::string> subTokens;
-            subTokens.reserve(4);
-            for (int i = 0; i < 4; ++i) {
-                tokenize(tokens.at(i + 1), '/', subTokens);
-                // Indices start at 1 that is why we have to subtract 1
-                // format is: vertex, uv, normal
-                // first triangle
-                indices.emplace_back(std::stoi(subTokens[0]) - 1);
-                indices.emplace_back(std::stoi(subTokens[1]) - 1);
-                indices.emplace_back(std::stoi(subTokens[3]) - 1);
-
-                // second triangle
-                indices.emplace_back(std::stoi(subTokens[0]) - 1);
-                indices.emplace_back(std::stoi(subTokens[1]) - 1);
-                indices.emplace_back(std::stoi(subTokens[2]) - 1);
-                subTokens.clear();
-            }
-        } else if (tokens.at(0).compare("f") == 0 && tokens.size() > 5) {  // faces
-            // Not implemented
-            ASSERT(0)
-        }
-    }
-
-    spMesh->bHasUVs = true;
-    spMesh->bHasNormals = true;
-    spMesh->faces = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit>(indices.size() / 3, 3 + 2 + 3);
-    auto& faces = spMesh->faces;
-    for (size_t i = 0, j = 0; i < indices.size(); i += 3, ++j) {
-        const Eigen::Vector3f& v = vertices[indices[i]];
-        const Eigen::Vector2f& uv = uvs[indices[i + 1]];
-        const Eigen::Vector3f& n = normals[indices[i + 2]];
-        faces(j, 0) = v.x();
-        faces(j, 1) = v.y();
-        faces(j, 2) = v.z();
-        faces(j, 3) = uv.x();
-        faces(j, 4) = uv.y();
-        faces(j, 5) = n.x();
-        faces(j, 6) = n.y();
-        faces(j, 7) = n.z();
     }
 
     Logger::GetInstance().GetLogger().info("{}: #Vertices: {}, #UVs: {}, #Normals: {}, #Faces: {}",
@@ -171,42 +317,8 @@ std::unique_ptr<Mesh> ObjFileParser::GetMesh(const File& rRawData) {
                                            vertices.size(),
                                            uvs.size(),
                                            normals.size(),
-                                           spMesh->faces.rows() / (3 * 9));
+                                           spMesh->vertices.size() / 3);
 
-    return spMesh;
-}
-
-std::unique_ptr<Texture> ObjFileParser::GetTexture(const File& rRawData) {
-    std::string filename;
-
-    {
-        const std::string buffer = rRawData.GetContents();
-        std::istringstream iss(buffer);
-        for (std::string line; std::getline(iss, line);) {
-            std::vector<std::string> tokens;
-            tokenize(line, ' ', tokens);
-
-            if (tokens.at(0).compare("mtllib") == 0 && tokens.size() == 2) {
-                filename = tokens.at(1);
-                break;
-            }
-        }
-    }
-
-    if (!filename.empty()) {
-        auto materialFile = File(filename, File::FileType::Model);
-        const std::string buffer = materialFile.GetContents();
-        std::istringstream iss(buffer);
-        for (std::string line; std::getline(iss, line);) {
-            std::vector<std::string> tokens;
-            tokenize(line, ' ', tokens);
-
-            if (tokens.at(0).compare("map_Kd") == 0 && tokens.size() == 2) {
-                filename = tokens.at(1);
-                return std::make_unique<Texture>(File(filename, File::FileType::Model));
-            }
-        }
-    }
-
-    return nullptr;
+    spModel->SetMesh(std::move(spMesh));
+    return spModel;
 }

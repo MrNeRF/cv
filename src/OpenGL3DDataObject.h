@@ -20,10 +20,10 @@ class OpenGL3DDataObject {
 
    private:
     // Vertex Array Object
-    unsigned int m_VAO = 0;
-    unsigned int m_VBO = 0;
-    unsigned int m_Texture1 = std::numeric_limits<unsigned int>::max();
-    uint32_t m_vertexRenderCount = 0;
+    unsigned int _VAO = 0;
+    unsigned int _VBO = 0;
+    unsigned int _Texture1 = std::numeric_limits<unsigned int>::max();
+    uint32_t _vertexRenderCount = 0;
 };
 
 #endif

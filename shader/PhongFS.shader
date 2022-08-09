@@ -11,7 +11,7 @@ struct Material
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
-	float shininess;
+	float specularExponent;
 };
 
 struct Light
@@ -40,7 +40,7 @@ void main()
             
     vec3 viewDir = normalize(cameraPos - vertexWorldPosition);
     vec3 reflectDir = reflect(-lightDir, vNormal);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.f), material.shininess);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.f), material.specularExponent);
 	vec3 specular = light.specular * (spec * material.specular);
 
 	vec3 result = (ambient + diffuse + specular) * texture(inputTexture, uv).xyz;

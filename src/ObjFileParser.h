@@ -7,13 +7,12 @@
 #include <vector>
 #include "File.h"
 
-struct Mesh;
+class Model;
 struct Texture;
 
 class ObjFileParser {
    public:
-    static std::unique_ptr<Mesh> GetMesh(const File& rRawData);
-    static std::unique_ptr<Texture> GetTexture(const File& rRawData);
+    static std::unique_ptr<Model> ImportModel(const File& rRawData);
 };
 
 #endif

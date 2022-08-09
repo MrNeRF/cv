@@ -16,10 +16,10 @@ class ImageCanvas : public IRenderable {
    public:
     ImageCanvas();
     void SetShader(std::unique_ptr<Shader> spShader) override;
-    void SetTexture(std::unique_ptr<Texture> spTexture) override;
+    void SetTexture(std::unique_ptr<Texture> spTexture);
     void Render() override;
     Mesh* GetMesh() override;
-    Texture* GetTexture() override;
+    Texture* GetTexture();
     const std::string& GetName() const override;
 
    private:

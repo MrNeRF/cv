@@ -8,12 +8,20 @@
 #include <array>
 #include <vector>
 #include "Eigen/Dense"
+#include "Material.h"
+
+struct Vertex {
+    Eigen::Vector3f position;
+    Eigen::Vector2f uv;
+    Eigen::Vector3f normal;
+    Eigen::Vector4f color;
+};
 
 struct Mesh {
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajorBit> faces;
-    bool bHasVertices = true;
-    bool bHasUVs = false;
+    std::vector<Vertex> vertices;
     bool bHasNormals = false;
+    bool bHasUVs = false;
+    bool bHasColor = false;
 };
 
 #endif  // LEARNOPENGL_MESH_H

@@ -1,5 +1,6 @@
 #include "Viewer3D.h"
 #include <GLFW/glfw3.h>
+#include <memory>
 #include "Camera.h"
 #include "Importer.h"
 #include "Light.h"
