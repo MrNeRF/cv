@@ -8,6 +8,7 @@
 #include "Model.h"
 #include "Mesh.h"
 #include "Texture.h"
+#include "RenderUnit.h"
 
 enum class ObjFormatSymbols {
     vertexPosition,
@@ -71,6 +72,12 @@ struct VertexIndices {
     uint32_t vn_index = std::numeric_limits<uint32_t>::max();
 };
 
+struct VertexData {
+    std::vector<Eigen::Vector3f> position;
+    std::vector<Eigen::Vector2f> uvs;
+    std::vector<Eigen::Vector3f> normals;
+};
+
 static void tokenize(const std::string& line, char delim, std::vector<std::string>& tokens) {
 
     auto start = find(cbegin(line), cend(line), delim);
@@ -84,17 +91,34 @@ static void tokenize(const std::string& line, char delim, std::vector<std::strin
     }
 }
 
-static std::unique_ptr<Material> importMaterial(const std::string materialFileName) {
+void importMaterial(const std::string& materialFileName, Model* pModel) {
     auto materialFile = File(materialFileName, File::FileType::Model);
     const std::string buffer = materialFile.GetContents();
     std::istringstream iss(buffer);
-    std::unique_ptr<Material> spMaterial = std::make_unique<Material>();
+    std::unique_ptr<Material> spMaterial = nullptr;
     for (std::string line; std::getline(iss, line);) {
+        if(line.size() == 0) {
+            continue;
+        }
         std::vector<std::string> tokens;
-        tokenize(line, ' ', tokens);
+        if(find(cbegin(line), cend(line), '\t') != cend(line)) {
+            tokenize(line, '\t', tokens);
+        } else {
+            tokenize(line, ' ', tokens);
+        }
+
+        if(!materialLibSymbolMapping.contains(tokens[0])) {
+            continue;
+        }
+        tokens[tokens.size() - 1].erase(tokens[tokens.size() - 1].find_last_not_of("\r\n") + 1);
         const auto symbol = materialLibSymbolMapping[tokens[0]];
         switch (symbol) {
         case MaterialObjLibSymbols::newMaterial:
+            if(spMaterial != nullptr) {
+                pModel->AddMaterial(std::move(spMaterial));
+            }
+            spMaterial = std::make_unique<Material>();
+            spMaterial->materialName = tokens[1];
             break;
         case MaterialObjLibSymbols::specularExponent:
             spMaterial->specularExponent = std::stof(tokens[1]);
@@ -125,7 +149,10 @@ static std::unique_ptr<Material> importMaterial(const std::string materialFileNa
         }
     }
 
-    return spMaterial;
+    // Last Material has to be added
+    if(spMaterial != nullptr) {
+        pModel->AddMaterial(std::move(spMaterial));
+    }
 }
 
 std::pair<std::vector<VertexIndices>, FaceFormat> extractIndices(const std::vector<std::string>& rTokens) {
@@ -159,7 +186,6 @@ std::pair<std::vector<VertexIndices>, FaceFormat> extractIndices(const std::vect
         indices.push_back(std::stoi(indexString) - 1);
         faceFormat = faceFormat == FaceFormat::v_vn ? FaceFormat::v_vn : numberOfSlashes == 2 ? FaceFormat::v_vt_vn
                                                                                               : FaceFormat::v_vt;
-
         switch (faceFormat) {
         case FaceFormat::undefined:  // None set
             break;
@@ -186,35 +212,102 @@ std::pair<std::vector<VertexIndices>, FaceFormat> extractIndices(const std::vect
     return std::make_pair(vertexIndices, faceFormat);
 }
 
+void addFace(RenderUnit* pRenderUnit, const VertexData &rVertexData, const std::vector<VertexIndices> &rVertexIndices, FaceFormat fFormat) {
+
+    std::vector<uint32_t> indexPositions;
+    if (rVertexIndices.size() == 3) {
+        indexPositions = std::vector<uint32_t>{0, 1, 2};
+    } else if (rVertexIndices.size() == 4) {
+        // split quad into two triangles via indices
+        indexPositions = std::vector<uint32_t>{0, 1, 3, 1, 2, 3};  // First triangle: 0,1,3; second triangle: 1,2,3
+    } else {
+        ASSERT(0);
+        // Not yet implemented
+        return;
+    }
+
+    for (const uint32_t idx : indexPositions) {
+        Vertex vertex;
+        switch (fFormat) {
+        case FaceFormat::undefined:
+            break;
+        case FaceFormat::v_vt:
+            vertex.position = rVertexData.position[rVertexIndices[idx].v_index];
+            vertex.uv = rVertexData.uvs[rVertexIndices[idx].vt_index];
+            pRenderUnit->spMesh->vertices.push_back(vertex);
+            pRenderUnit->spMesh->bHasUVs = true;
+            break;
+        case FaceFormat::v_vn:
+            vertex.position = rVertexData.position[rVertexIndices[idx].v_index];
+            vertex.normal = rVertexData.normals[rVertexIndices[idx].vn_index];
+            pRenderUnit->spMesh->vertices.push_back(vertex);
+            pRenderUnit->spMesh->bHasNormals = true;
+            break;
+        case FaceFormat::v_vt_vn:
+            vertex.position = rVertexData.position[rVertexIndices[idx].v_index];
+            vertex.uv = rVertexData.uvs[rVertexIndices[idx].vt_index];
+            vertex.normal = rVertexData.normals[rVertexIndices[idx].vn_index];
+            pRenderUnit->spMesh->vertices.push_back(vertex);
+            pRenderUnit->spMesh->bHasNormals = true;
+            pRenderUnit->spMesh->bHasUVs = true;
+            break;
+        case FaceFormat::v_v_v:
+            vertex.position = rVertexData.position[rVertexIndices[idx].v_index];
+            pRenderUnit->spMesh->vertices.push_back(vertex);
+            break;
+        }
+    }
+}
+
 std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
     const std::string buffer = rRawData.GetContents();
     std::unique_ptr<Model> spModel = std::make_unique<Model>();
-    std::unique_ptr<Mesh> spMesh = std::make_unique<Mesh>();
+    std::unique_ptr<RenderUnit> spRenderUnit;
+    VertexData vertexData;
+
     std::istringstream iss(buffer);
 
-    std::vector<Eigen::Vector3f> vertices;
-    std::vector<Eigen::Vector2f> uvs;
-    std::vector<Eigen::Vector3f> normals;
-
     for (std::string line; std::getline(iss, line);) {
-        std::vector<std::string> tokens;
-        tokenize(line, ' ', tokens);
+        if(line.size() == 0) {
+            continue;
+        }
 
+        std::vector<std::string> tokens;
+        if(find(cbegin(line), cend(line), '\t') != cend(line)) {
+            tokenize(line, '\t', tokens);
+        } else {
+            tokenize(line, ' ', tokens);
+        }
+
+        if(!objSymbolsMapping.contains(tokens[0])) {
+           continue;
+        }
         const auto symbol = objSymbolsMapping[tokens[0]];
         switch (symbol) {
         case ObjFormatSymbols::vertexPosition:
-            vertices.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3)));
+            vertexData.position.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3)));
             break;
         case ObjFormatSymbols::uv:
-            uvs.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)));
+            vertexData.uvs.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)));
             break;
         case ObjFormatSymbols::normal:
-            normals.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3)));
+            vertexData.normals.emplace_back(std::stof(tokens[1]), std::stof(tokens.at(2)), std::stof(tokens.at(3)));
             break;
         case ObjFormatSymbols::materialLib:
-            spModel->SetMaterial(importMaterial(tokens[1]));
+            tokens[1].erase(tokens[1].find_last_not_of("\r\n") + 1);
+            importMaterial(tokens[1], spModel.get());
             break;
         case ObjFormatSymbols::useMaterial:
+            if(spRenderUnit != nullptr) {
+                ASSERT(spRenderUnit->spMesh != nullptr)
+                spModel->AddRenderUnit(std::move(spRenderUnit));
+                spRenderUnit = nullptr;
+            }
+            spRenderUnit = std::make_unique<RenderUnit>();
+            spRenderUnit->spMesh = std::make_unique<Mesh>();
+            tokens[1].erase(tokens[1].find_last_not_of("\r\n") + 1);
+            spRenderUnit->pMaterial = spModel->GetMaterial(tokens[1]);
+            ASSERT(spRenderUnit->pMaterial != 0)
             break;
         case ObjFormatSymbols::comment:
             // Comment. Skip!
@@ -228,80 +321,9 @@ std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
             break;
         case ObjFormatSymbols::face: {
             auto [vertexIndices, fFormat] = extractIndices(tokens);
-            if (vertexIndices.size() == 3) {
-                for (const auto& rVertexIndex : vertexIndices) {
-                    Vertex vertex;
-                    vertex.position = vertices[rVertexIndex.v_index];
-                    switch (fFormat) {
-                    case FaceFormat::undefined:
-                        break;
-                    case FaceFormat::v_vt:
-                        vertex.uv = uvs[rVertexIndex.vt_index];
-                        spMesh->bHasUVs = true;
-                        break;
-                    case FaceFormat::v_vn:
-                        vertex.normal = normals[rVertexIndex.vn_index];
-                        spMesh->bHasNormals = true;
-                        break;
-                    case FaceFormat::v_vt_vn:
-                        vertex.uv = uvs[rVertexIndex.vt_index];
-                        vertex.normal = normals[rVertexIndex.vn_index];
-                        spMesh->bHasNormals = true;
-                        spMesh->bHasUVs = true;
-                        break;
-                    case FaceFormat::v_v_v:
-                        break;
-                    }
-                    spMesh->vertices.push_back(vertex);
-                }
-            } else if (vertexIndices.size() == 4) {
-                // split quad into two triangles via indices
-                std::array<uint32_t, 6> vertexIndex{0, 1, 3, 1, 2, 3};  // First triangle: 0,1,3; second triangle: 1,2,3
-                switch (fFormat) {
-                case FaceFormat::undefined:
-                    break;
-                case FaceFormat::v_vt:
-                    for (const uint32_t idx : vertexIndex) {
-                        Vertex vertex;
-                        vertex.position = vertices[idx];
-                        vertex.uv = uvs[idx];
-                        spMesh->vertices.push_back(vertex);
-                        spMesh->bHasUVs = true;
-                    }
-                    break;
-                case FaceFormat::v_vn:
-                    for (const uint32_t idx : vertexIndex) {
-                        Vertex vertex;
-                        vertex.position = vertices[idx];
-                        vertex.normal = normals[idx];
-                        spMesh->vertices.push_back(vertex);
-                        spMesh->bHasNormals = true;
-                    }
-                    break;
-                case FaceFormat::v_vt_vn:
-                    for (const uint32_t idx : vertexIndex) {
-                        Vertex vertex;
-                        vertex.position = vertices[idx];
-                        vertex.uv = uvs[idx];
-                        vertex.normal = normals[idx];
-                        spMesh->vertices.push_back(vertex);
-                        spMesh->bHasNormals = true;
-                        spMesh->bHasUVs = true;
-                    }
-                    break;
-                case FaceFormat::v_v_v:
-                    for (const uint32_t idx : vertexIndex) {
-                        Vertex vertex;
-                        vertex.position = vertices[idx];
-                        spMesh->vertices.push_back(vertex);
-                    }
-                    break;
-                }
-            } else {
-                ASSERT(0);
+            addFace(spRenderUnit.get(), vertexData, vertexIndices, fFormat);
             }
             break;
-        }
         default:
             Logger::GetInstance().GetLogger().info("{}: Token {} not implemented",
                                                    rRawData.GetFilePath().filename().string(),
@@ -312,13 +334,21 @@ std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
         }
     }
 
-    Logger::GetInstance().GetLogger().info("{}: #Vertices: {}, #UVs: {}, #Normals: {}, #Faces: {}",
-                                           rRawData.GetFilePath().filename().string(),
-                                           vertices.size(),
-                                           uvs.size(),
-                                           normals.size(),
-                                           spMesh->vertices.size() / 3);
+    if(spRenderUnit != nullptr) {
+        ASSERT(spRenderUnit->spMesh != nullptr)
+        spModel->AddRenderUnit(std::move(spRenderUnit));
+        spRenderUnit = nullptr;
+    } else {
+        ASSERT(0)
+    }
 
-    spModel->SetMesh(std::move(spMesh));
+//    Logger::GetInstance().GetLogger().info("{}: #Vertices: {}, #UVs: {}, #Normals: {}, #Faces: {}",
+//                                           rRawData.GetFilePath().filename().string(),
+//                                           vertices.size(),
+//                                           uvs.size(),
+//                                           normals.size(),
+//                                           spMesh->vertices.size() / 3);
+//
+//    spModel->SetMesh(std::move(spMesh));
     return spModel;
 }

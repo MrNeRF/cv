@@ -22,12 +22,11 @@ PhongShader::PhongShader() : Shader(shaderName) {
 
 void PhongShader::SetMaterial(const Material& rMaterial) {
     Shader::activateShader();
-    _spMaterial = std::make_unique<Material>();
     // Pro tip: watch out upper/lower case (e.g. same as instance of struct in shader)
-    SetVector("material.ambient", _spMaterial->ambient);
-    SetVector("material.diffuse", _spMaterial->diffuse);
-    SetVector("material.specular", _spMaterial->specular);
-    SetValue("material.specularExponent", _spMaterial->specularExponent);
+    SetVector("material.ambient", rMaterial.ambient);
+    SetVector("material.diffuse", rMaterial.diffuse);
+    SetVector("material.specular", rMaterial.specular);
+    SetValue("material.specularExponent", rMaterial.specularExponent);
 }
 
 void PhongShader::SetLightSource(std::shared_ptr<Light> spLight) {
@@ -52,9 +51,6 @@ void PhongShader::SetCamera(std::shared_ptr<Camera> spCamera) {
 void PhongShader::ActivateShader(const IRenderable* pRenderObject) {
     if (_spLight == nullptr) {
         Logger::GetInstance().GetLogger().warn("Light not set in shader {}", shaderName);
-    }
-    if (_spMaterial == nullptr) {
-        Logger::GetInstance().GetLogger().warn("Material not set in shader {}", shaderName);
     }
     if (_spCamera == nullptr) {
         Logger::GetInstance().GetLogger().warn("Camera not set in shader {}", shaderName);

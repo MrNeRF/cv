@@ -32,6 +32,9 @@ class Shader {
     virtual void ActivateShader(const IRenderable* pRenderObject) = 0;
     unsigned int GetShaderProgramID(void) { return _shaderProgramID; };
 
+    virtual void SetName(const std::string& rName) = 0;
+    virtual const std::string& GetName(const std::string& rName) const = 0;
+
     template <typename T>
     void SetValue(const std::string& name, T value);
     void SetQuat(const std::string& name, const Eigen::Quaternionf& v) {

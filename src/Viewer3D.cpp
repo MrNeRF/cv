@@ -19,15 +19,18 @@ void Viewer3D::Run(void) {
     auto& rLogger = Logger::GetInstance().GetLogger();
     rLogger.info("Viewer3D::Run()");
 
-    /* auto spModel = Importer::ImportModel("LibertyStatue/LibertStatue.obj"); */
-    auto spModel = Importer::ImportModel("dice.obj");
-    auto spPhongShader = std::make_unique<PhongShader>();
+    auto spModel = Importer::ImportModel("LibertStatue.obj");
+//    auto spModel = Importer::ImportModel("dice.obj");
 
-    spPhongShader->SetLightSource(std::make_shared<Light>());
-    spPhongShader->SetMaterial(Material());
-    spPhongShader->SetCamera(_spCamera);
-
-    spModel->SetShader(std::move(spPhongShader));
+    auto& renderUnits = spModel->GetRenderUnits();
+    for(auto &renderUnit : renderUnits) {
+        auto spPhongShader = std::make_unique<PhongShader>();
+        spPhongShader->SetLightSource(std::make_shared<Light>());
+        spPhongShader->SetMaterial(*renderUnit->pMaterial);
+        spPhongShader->SetCamera(_spCamera);
+        spPhongShader->SetName(renderUnit->pMaterial->materialName);
+        renderUnit->pShader = spModel->AddShader(std::move(spPhongShader));
+    }
 
     _renderer.AddRenderable(std::move(spModel));
     CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));

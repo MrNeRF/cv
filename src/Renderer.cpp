@@ -3,6 +3,8 @@
 //
 
 #include "Renderer.h"
+#include "Model.h"
+
 void Renderer::Render() {
     for (auto& rData : _renderData) {
         rData.spRenderable->Render();
@@ -14,8 +16,10 @@ void Renderer::AddRenderable(std::unique_ptr<IRenderable> spRenderObject) {
     _renderData.emplace_back();
     _renderData.back().spRenderable = std::move(spRenderObject);
     IRenderable* pRenderObject = _renderData.back().spRenderable.get();
-    _renderData.back().openglData.InitializeBuffer(*pRenderObject->GetMesh());
-    _renderData.back().openglData.InitializeTextureBuffer(pRenderObject->GetTexture());
+    const auto& renderUnits = pRenderObject->GetRenderUnits();
+    for(const auto &spRenderUnit : renderUnits) {
+        _renderData.back().openglData.InitializeBuffer(spRenderUnit.get());
+    }
 }
 
 void Renderer::RemoveRenderable(const std::string& rName) {

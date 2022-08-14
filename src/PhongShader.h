@@ -16,13 +16,16 @@ class IRenderable;
 class PhongShader : public Shader {
    public:
     PhongShader();
+    void SetName(const std::string& rName) override { _name = rName; }
+    const std::string& GetName(const std::string& rName) const override { return _name; };
+
     void ActivateShader(const IRenderable* pRenderObject) override;
     void SetMaterial(const Material& rMaterial);
     void SetLightSource(std::shared_ptr<Light> spLight);
     void SetCamera(std::shared_ptr<Camera> spCamera);
 
    private:
-    std::unique_ptr<Material> _spMaterial;
+    std::string _name;
     std::shared_ptr<Light> _spLight;
     std::shared_ptr<Camera> _spCamera;
 };

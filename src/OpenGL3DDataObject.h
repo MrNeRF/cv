@@ -8,15 +8,18 @@
 
 struct Mesh;
 struct Texture;
+struct RenderUnit;
 
 class OpenGL3DDataObject {
    public:
     OpenGL3DDataObject();
     ~OpenGL3DDataObject(void);
-    void InitializeBuffer(Mesh& mesh);
-    void InitializeTextureBuffer(Texture* pTexture);
-    void UpdateTextureBuffer(const Texture* pTexture);
+    void InitializeBuffer(const RenderUnit *pRenderUnit);
     void DrawObject(GLenum mode) const;
+    void UpdateTextureBuffer(const Texture* pTexture);
+    private:
+    void initializeVertexData(const Mesh& mesh);
+    void initializeTextureData(const Texture* pTexture);
 
    private:
     // Vertex Array Object

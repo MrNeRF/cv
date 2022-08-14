@@ -2,6 +2,8 @@
 #include "Logger.h"
 #include "Mesh.h"
 #include "Texture.h"
+#include "RenderUnit.h"
+
 
 OpenGL3DDataObject::OpenGL3DDataObject() {
     CHECK_GL_ERROR_(glGenVertexArrays(1, &_VAO));
@@ -15,7 +17,13 @@ OpenGL3DDataObject::~OpenGL3DDataObject(void) {
     CHECK_GL_ERROR_(glDeleteBuffers(1, &_VBO))
 }
 
-void OpenGL3DDataObject::InitializeBuffer(Mesh& mesh) {
+void OpenGL3DDataObject::InitializeBuffer(const RenderUnit *pRenderUnit) {
+    ASSERT(pRenderUnit != nullptr)
+    initializeVertexData(*pRenderUnit->spMesh);
+    initializeTextureData(pRenderUnit->pMaterial->spTexure.get());
+}
+
+void OpenGL3DDataObject::initializeVertexData(const Mesh& mesh) {
     _vertexRenderCount = mesh.vertices.size();
     uint32_t dataCount = 3;
     dataCount += 2;
@@ -60,7 +68,7 @@ void OpenGL3DDataObject::InitializeBuffer(Mesh& mesh) {
     CHECK_GL_ERROR_(glBindVertexArray(0));
 }
 
-void OpenGL3DDataObject::InitializeTextureBuffer(Texture* pTexture) {
+void OpenGL3DDataObject::initializeTextureData(const Texture* pTexture) {
     if (pTexture == nullptr) {
         return;
     }

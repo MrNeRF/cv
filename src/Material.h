@@ -10,6 +10,7 @@
 #include <memory>
 
 struct Material {
+    std::string materialName;
     Eigen::Vector3f ambient{.5f, .5f, .5f};
     Eigen::Vector3f diffuse{.2f, .2f, .2f};
     Eigen::Vector3f specular{.2f, .2f, .2f};

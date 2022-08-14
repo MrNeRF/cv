@@ -25,7 +25,7 @@ class File {
     std::string GetFileEnding() const;
 
    private:
-    const std::filesystem::path _inputPath;
+    std::filesystem::path _inputPath;
 };
 
 #endif

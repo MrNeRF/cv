@@ -20,12 +20,20 @@ static std::string fileTypeFolderMapping(File::FileType fileType) {
 
 File::File(const std::string& fileName, const FileType fileType)
     : _inputPath{std::filesystem::current_path().parent_path().string() + "/" + fileTypeFolderMapping(fileType) + "/" + fileName} {
-    if (is_empty(_inputPath) || !exists(_inputPath)) {
-        std::cerr << "Error! No filename provided!\n";
+
+    if (exists(_inputPath)) {
         return;
+    } else {
+        for (const std::filesystem::directory_entry& dirEntry : std::filesystem::recursive_directory_iterator(_inputPath.parent_path())) {
+            std::string fn = dirEntry.path().filename().string();
+            if (fn ==_inputPath.filename().string()) {
+                _inputPath  = dirEntry.path();
+                break;
+            }
+        }
     }
 }
-//
+
 std::string File::GetContents() const {
     std::ifstream fileReader;
     fileReader.exceptions(std::ifstream::failbit | std::ifstream::badbit);

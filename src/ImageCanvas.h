@@ -11,21 +11,21 @@
 struct Mesh;
 class Shader;
 struct Texture;
+struct RenderUnit;
 
 class ImageCanvas : public IRenderable {
    public:
     ImageCanvas();
-    void SetShader(std::unique_ptr<Shader> spShader) override;
-    void SetTexture(std::unique_ptr<Texture> spTexture);
+
+    virtual const Shader* AddShader(std::unique_ptr<Shader> spShader) override;
+    virtual const std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() const override {return _renderUnits;}
+    virtual std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() override {return _renderUnits;}
     void Render() override;
-    Mesh* GetMesh() override;
-    Texture* GetTexture();
     const std::string& GetName() const override;
 
    private:
-    std::unique_ptr<Mesh> _spMesh;
-    std::unique_ptr<Shader> _spShader;
-    std::unique_ptr<Texture> _spTexture;
+    std::vector<std::unique_ptr<RenderUnit>> _renderUnits;
+    std::vector<std::unique_ptr<Shader>> _shader;
     std::string _name = "Canvas";
 };
 
