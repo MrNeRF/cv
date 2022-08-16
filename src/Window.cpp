@@ -88,6 +88,12 @@ static void APIENTRY glDebugOutput(GLenum source,
     std::cout << std::endl;
 }
 
+static void WindowResizeCallback(GLFWwindow* win, int h, int w);
+static void MouseInputCallback(GLFWwindow* win, int button, int action, int mods);
+static void MouseWheelCallback(GLFWwindow* win, double xoffset, double yoffset);
+static void CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos);
+static void KeyboardCallback(GLFWwindow* win, int key, int scancode, int action, int mods);
+
 int Window::Init() {
     // initialise glfw and _windowInstance,
     // create openGL context, initialise any other c++ resources
@@ -157,28 +163,47 @@ void Window::ViewPortUpdate(int width, int height) {
     CHECK_GL_ERROR_(glMatrixMode(GL_MODELVIEW))
 }
 
-void Window::WindowResizeCallback(GLFWwindow* win, int h, int w) {
+void WindowResizeCallback(GLFWwindow* win, int h, int w) {
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
     window->ViewPortUpdate(w, h);
 }
 
-void Window::MouseInputCallback(GLFWwindow* win, int button, int action, int mods) {
-    Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+void MouseInputCallback(GLFWwindow* win, int button, int action, int mods) {
+    auto* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+    InputEvent::MouseButton event;
+    event.button = button;
+    event.action = action;
+    event.mods = mods;
+    window->AddEvent(event);
     window->MouseDeviceUpdate(win, button, action, mods);
 }
 
-void Window::MouseWheelCallback(GLFWwindow* win, double xoffset, double yoffset) {
-    Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
-    window->MouseWheelUpdate(xoffset, yoffset);
+void MouseWheelCallback(GLFWwindow* win, double xoffset, double yoffset) {
+    auto* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+    InputEvent::MouseWheel event;
+    event.xOffset = xoffset;
+    event.yOffeset = yoffset;
+    window->AddEvent(event);
 }
 
-void Window::CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos) {
-    Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+void CursorPositionCallback(GLFWwindow* win, double xCursorPos, double yCursorPos) {
+    auto* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+    InputEvent::MouseCursor event;
+    event.xCursorPos = xCursorPos;
+    event.yCursorPos = yCursorPos;
+    window->AddEvent(event);
     window->CursorPositionUpdate(xCursorPos, yCursorPos);
 }
 
-void Window::KeyboardCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
-    Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+void KeyboardCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
+    auto* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+
+    InputEvent::Keyboard event;
+    event.key = key;
+    event.scancode = scancode;
+    event.action = action;
+    event.mods = mods;
+    window->AddEvent(event);
     window->KeyboardDeviceUpdate(key, scancode, action, mods);
 }
 
@@ -215,9 +240,6 @@ void Window::KeyboardDeviceUpdate(int key, int scancode, int action, int mods) {
             break;
         }
     }
-}
-
-void Window::MouseWheelUpdate(double xoffset, double yoffset) {
 }
 
 void Window::CursorPositionUpdate(double xCursorPos, double yCursorPos) {

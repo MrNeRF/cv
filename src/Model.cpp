@@ -8,8 +8,23 @@
 
 void Model::Render() {
     ASSERT(_renderUnits.size() == _shaders.size());
+    size_t maxVertices = 0;
+    int pos = 0;
+    int maxPos = 0;
+    for(auto &spRenderUnit : _renderUnits) {
+        if(spRenderUnit->spMesh->vertices.size() > maxVertices) {
+            maxVertices = spRenderUnit->spMesh->vertices.size();
+            maxPos = pos;
+        }
+        ++pos;
+    }
+    pos = 0;
+    maxPos = 0;
     for(auto &spShader : _shaders) {
-        spShader->ActivateShader(this);
+        if(pos == maxPos) {
+            spShader->ActivateShader(this);
+        }
+        ++pos;
     }
 }
 

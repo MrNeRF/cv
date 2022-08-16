@@ -45,6 +45,7 @@ set(MY_EXECUTABLE_SOURCES
     src/Importer.cpp
     src/Model.cpp
     src/ObjFileParser.cpp
+    src/Observer.cpp
     src/OpenGL3DDataObject.cpp
     src/PhongShader.cpp
     src/Renderer.cpp

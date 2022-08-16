@@ -5,7 +5,6 @@
 #include "Importer.h"
 #include "Light.h"
 #include "Logger.h"
-#include "Material.h"
 #include <chrono>
 #include "PhongShader.h"
 
@@ -55,6 +54,7 @@ void Viewer3D::render() {
     while (!glfwWindowShouldClose(_spWindow->GetGLFWWindow())) {
         auto t1 = std::chrono::high_resolution_clock().now();
         CHECK_GL_ERROR_(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT))
+        _spWindow->HandleInputEvent();
 
         // UpdatePositions
         _spCamera->UpdateCameraPosition(_spWindow->GetCursorPostionDelta(), 1. / static_cast<double>(fps));
@@ -62,7 +62,7 @@ void Viewer3D::render() {
         _renderer.Render();
         glfwSwapBuffers(_spWindow->GetGLFWWindow());
 
-        glfwPollEvents();
+        glfwPollEvents(); // should be invoked ater glfwSwapBuffers
         auto t2 = std::chrono::high_resolution_clock().now();
         auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
         fps = static_cast<uint32_t>(1000L / std::max(time_elapsed, 1L));
