@@ -27,9 +27,9 @@ class Model : public IRenderable {
     void Render() override;
     [[nodiscard]] const std::string& GetName() const override { return _name; }
     void SetName(const std::string& name) {_name = name;}
-    void AddRenderUnit(std::unique_ptr<RenderUnit> spRenderUnit) {_renderUnits.push_back(std::move(spRenderUnit));}
+    void AddRenderUnit(std::unique_ptr<RenderUnit> spRenderUnit);
 
-    const Shader* AddShader(std::unique_ptr<Shader> spShader) override;
+    Shader* AddShader(std::unique_ptr<Shader> spShader) override;
     void SetOrientation(const Eigen::AngleAxisf& angleAxis) { _orientation = Eigen::Quaternionf(angleAxis) * _orientation; }
 
     void SetPosition(const Eigen::Vector4f& pos) { _position = pos; }

@@ -46,6 +46,6 @@ void main()
     uv = uvIn;
     vertexNormal = transpose(inverse(normalRotationMatrix)) * vertNormalIn;
     
-    vertexWorldPosition = vertPosIn;
-    gl_Position = projection * view  * vec4(vertPosIn, 1.f);
+    vertexWorldPosition = vertPosIn + transform.position.xyz;
+    gl_Position = projection * view  * vec4(vertexWorldPosition, 1.f);
 }

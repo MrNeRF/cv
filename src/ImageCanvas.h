@@ -17,7 +17,7 @@ class ImageCanvas : public IRenderable {
    public:
     ImageCanvas();
 
-    virtual const Shader* AddShader(std::unique_ptr<Shader> spShader) override;
+    virtual Shader* AddShader(std::unique_ptr<Shader> spShader) override;
     virtual const std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() const override {return _renderUnits;}
     virtual std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() override {return _renderUnits;}
     void Render() override;

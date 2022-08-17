@@ -96,7 +96,7 @@ void ImageCanvas::Render() {
 //    _spShader->ActivateShader(this);
 }
 
-const Shader* ImageCanvas::AddShader(std::unique_ptr<Shader> spShader) {
+Shader* ImageCanvas::AddShader(std::unique_ptr<Shader> spShader) {
 //    ASSERT(spShader != nullptr);
     _shader.push_back(std::move(spShader));
     return _shader.back().get();

@@ -3,8 +3,9 @@
 
 #include <Eigen/Dense>
 #include <iostream>
+#include "IObserver.h"
 
-class Camera {
+class Camera : public IObserver {
    public:
     Camera() = default;
     explicit Camera(Eigen::Vector3f& eye, Eigen::Vector3f& target, Eigen::Vector3f& up)
@@ -19,6 +20,7 @@ class Camera {
     void UpdateCameraPosition(Eigen::Vector2d deltaCursorPos, double delta_time);
 
     // Observer
+    void Update(const InputEvent::IEvent &rEvent) override;
    private:
     float _fov = 45.f;
     float _zNear = 1.f;

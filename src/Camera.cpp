@@ -80,6 +80,12 @@ void Camera::UpdateCameraPosition(Eigen::Vector2d deltaCursorPos, double delta_t
         _eye = rot_yaw * _eye;
     }
 }
+void Camera::Update(const InputEvent::IEvent& rEvent) {
+    const auto& event = dynamic_cast<const InputEvent::MouseWheel&>(rEvent);
+    _fov -= static_cast<float>(event.yOffeset) * .05f;
+    std::cout << _fov << "\n";
+    SetPerspectiveProjection(_fov, _aspectRatio, _zNear, _zFar);
+}
 
 Eigen::Matrix4f ComputeFrustum(float left, float right, float bottom, float top, float near, float far) {
     Eigen::Matrix4f projection = Eigen::Matrix4f::Zero(4, 4);

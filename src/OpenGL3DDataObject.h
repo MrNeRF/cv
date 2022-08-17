@@ -14,7 +14,7 @@ class OpenGL3DDataObject {
    public:
     OpenGL3DDataObject();
     ~OpenGL3DDataObject(void);
-    void InitializeBuffer(const RenderUnit *pRenderUnit);
+    void InitializeBuffer(const Mesh *pMesh, const Texture *pTexture);
     void DrawObject(GLenum mode) const;
     void UpdateTextureBuffer(const Texture* pTexture);
     private:

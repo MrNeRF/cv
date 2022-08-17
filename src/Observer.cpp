@@ -3,13 +3,12 @@
 //
 
 #include "Observer.h"
-#include <iostream>
 
 void Observer::operator()(const InputEvent::MouseButton &rEvent) {
     for (std::weak_ptr<IObserver>& spObserver : mouseButtonObserver) {
         if (!spObserver.expired()) {
             auto sp = spObserver.lock();
-            (*sp).update(rEvent);
+            (*sp).Update(rEvent);
         }
     }
 }
@@ -18,7 +17,7 @@ void Observer::operator()(const InputEvent::MouseWheel &rEvent) {
     for (std::weak_ptr<IObserver>& spObserver : mouseWheelObserver) {
         if (!spObserver.expired()) {
             auto sp = spObserver.lock();
-            (*sp).update(rEvent);
+            (*sp).Update(rEvent);
         }
     }
 }
@@ -27,7 +26,7 @@ void Observer::operator()(const InputEvent::MouseCursor &rEvent) {
     for (std::weak_ptr<IObserver>& spObserver : mouseCursorObserver) {
         if (!spObserver.expired()) {
             auto sp = spObserver.lock();
-            (*sp).update(rEvent);
+            (*sp).Update(rEvent);
         }
     }
 }
@@ -36,7 +35,7 @@ void Observer::operator()(const InputEvent::Keyboard &rEvent) {
     for (std::weak_ptr<IObserver>& spObserver : keyboardObserver) {
         if (!spObserver.expired()) {
             auto sp = spObserver.lock();
-            (*sp).update(rEvent);
+            (*sp).Update(rEvent);
         }
     }
 }

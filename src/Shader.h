@@ -55,7 +55,7 @@ class Shader {
 
    protected:
     void initShaders(const File& vertexShaderRaw, const File& fragmentShaderRaw);
-    void activateShader() { CHECK_GL_ERROR_(glUseProgram(_shaderProgramID)); }
+    void activateShader();
 
    private:
     unsigned int createShader(const std::string& shaderProgramCode, const Shader::ShaderType& shaderType);

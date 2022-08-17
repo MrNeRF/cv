@@ -18,7 +18,7 @@ void Shader::initShaders(const File& vertexShaderRaw, const File& fragmentShader
 
     // Shader Program
     createShaderProgram(shaderIDs);
-    rLogger.info("Shader Program created");
+    rLogger.info("Shader Program with ID {} created", _shaderProgramID);
 }
 
 unsigned int Shader::createShader(const std::string& shaderProgramCode, const Shader::ShaderType& shaderType) {
@@ -35,8 +35,8 @@ unsigned int Shader::createShader(const std::string& shaderProgramCode, const Sh
     default:
         break;
     }
-    const GLchar* code = (const GLchar*)shaderProgramCode.c_str();
-    CHECK_GL_ERROR_(glShaderSource(shaderID, 1, &code, NULL));
+    const auto* code = (const GLchar*)shaderProgramCode.c_str();
+    CHECK_GL_ERROR_(glShaderSource(shaderID, 1, &code, nullptr));
     CHECK_GL_ERROR_(glCompileShader(shaderID));
     checkCompileErrors(shaderID, shaderType);
     return shaderID;
@@ -88,4 +88,10 @@ void Shader::checkCompileErrors(unsigned int shaderID, const Shader::ShaderType&
     default:
         break;
     };
+}
+
+void Shader::activateShader() {
+    auto& rLogger = Logger::GetInstance().GetLogger();
+    rLogger.info("Activate Shader with program id {}", _shaderProgramID);
+    { CHECK_GL_ERROR_(glUseProgram(_shaderProgramID)); }
 }

@@ -17,14 +17,17 @@ OpenGL3DDataObject::~OpenGL3DDataObject(void) {
     CHECK_GL_ERROR_(glDeleteBuffers(1, &_VBO))
 }
 
-void OpenGL3DDataObject::InitializeBuffer(const RenderUnit *pRenderUnit) {
-    ASSERT(pRenderUnit != nullptr)
-    initializeVertexData(*pRenderUnit->spMesh);
-    initializeTextureData(pRenderUnit->pMaterial->spTexure.get());
+void OpenGL3DDataObject::InitializeBuffer(const Mesh *pMesh, const Texture *pTexture) {
+    ASSERT(pMesh != nullptr)
+    ASSERT(pMesh->vertices.size() > 0)
+    initializeVertexData(*pMesh);
+    if(pTexture != nullptr) {
+        initializeTextureData(pTexture);
+    }
 }
 
 void OpenGL3DDataObject::initializeVertexData(const Mesh& mesh) {
-    _vertexRenderCount = mesh.vertices.size();
+   _vertexRenderCount =mesh.vertices.size();
     uint32_t dataCount = 3;
     dataCount += 2;
     dataCount += 3;
@@ -104,6 +107,8 @@ void OpenGL3DDataObject::DrawObject(GLenum mode) const {
     if (_Texture1 != std::numeric_limits<unsigned int>::max()) {
         glBindTexture(GL_TEXTURE_2D, _Texture1);
     }
+
+    std::cout << "Bind vertex array " << _VAO << '\n';
     CHECK_GL_ERROR_(glBindVertexArray(_VAO))
     CHECK_GL_ERROR_(glDrawArrays(mode, 0, _vertexRenderCount))
     CHECK_GL_ERROR_(glBindVertexArray(0))

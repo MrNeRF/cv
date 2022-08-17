@@ -9,12 +9,7 @@
 #include <variant>
 #include <vector>
 #include "InputEvents.h"
-
-class IObserver {
-   public:
-    virtual ~IObserver() = default;
-    virtual void update(const InputEvent::IEvent &rEvent) = 0;
-};
+#include "IObserver.h"
 
 class Observer {
    public:
