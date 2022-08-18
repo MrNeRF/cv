@@ -91,6 +91,7 @@ IncludeCategories:
   - Regex:           '^<.*'
     Priority:        2
 IndentWidth: 4
+NamespaceIndentation: All
 PenaltyBreakFirstLessLess: 120
 PenaltyBreakString: 1000
 PenaltyBreakTemplateDeclaration: 10
