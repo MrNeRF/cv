@@ -8,8 +8,8 @@
 #include <memory>
 #include <variant>
 #include <vector>
-#include "InputEvents.h"
 #include "IObserver.h"
+#include "InputEvents.h"
 
 class Observer {
    public:
@@ -19,7 +19,7 @@ class Observer {
     void operator()(const InputEvent::Keyboard &rEvent);
 
     void HandleInputEvent();
-    void RegisterObserver(const std::weak_ptr<IObserver>& spObserver, InputEvent::InputEventType eventType);
+    void RegisterObserver(const std::weak_ptr<IObserver> &spObserver, InputEvent::InputEventType eventType);
     void AddEvent(const InputEvent::IEvent &rEvent);
 
    private:

@@ -26,8 +26,8 @@ File::File(const std::string& fileName, const FileType fileType)
     } else {
         for (const std::filesystem::directory_entry& dirEntry : std::filesystem::recursive_directory_iterator(_inputPath.parent_path())) {
             std::string fn = dirEntry.path().filename().string();
-            if (fn ==_inputPath.filename().string()) {
-                _inputPath  = dirEntry.path();
+            if (fn == _inputPath.filename().string()) {
+                _inputPath = dirEntry.path();
                 break;
             }
         }

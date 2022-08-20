@@ -5,10 +5,10 @@
 #include "Logger.h"
 #include "Macros.h"
 #include "Material.h"
-#include "Model.h"
 #include "Mesh.h"
-#include "Texture.h"
+#include "Model.h"
 #include "RenderUnit.h"
+#include "Texture.h"
 
 enum class ObjFormatSymbols {
     vertexPosition,
@@ -97,24 +97,24 @@ void importMaterial(const std::string& materialFileName, Model* pModel) {
     std::istringstream iss(buffer);
     std::unique_ptr<Material> spMaterial = nullptr;
     for (std::string line; std::getline(iss, line);) {
-        if(line.size() == 0) {
+        if (line.size() == 0) {
             continue;
         }
         std::vector<std::string> tokens;
-        if(find(cbegin(line), cend(line), '\t') != cend(line)) {
+        if (find(cbegin(line), cend(line), '\t') != cend(line)) {
             tokenize(line, '\t', tokens);
         } else {
             tokenize(line, ' ', tokens);
         }
 
-        if(!materialLibSymbolMapping.contains(tokens[0])) {
+        if (!materialLibSymbolMapping.contains(tokens[0])) {
             continue;
         }
         tokens[tokens.size() - 1].erase(tokens[tokens.size() - 1].find_last_not_of("\r\n") + 1);
         const auto symbol = materialLibSymbolMapping[tokens[0]];
         switch (symbol) {
         case MaterialObjLibSymbols::newMaterial:
-            if(spMaterial != nullptr) {
+            if (spMaterial != nullptr) {
                 pModel->AddMaterial(std::move(spMaterial));
             }
             spMaterial = std::make_unique<Material>();
@@ -124,13 +124,13 @@ void importMaterial(const std::string& materialFileName, Model* pModel) {
             spMaterial->specularExponent = std::stof(tokens[1]);
             break;
         case MaterialObjLibSymbols::ambientColor:
-            spMaterial->ambient = {std::stof(tokens[1]), std::stof(tokens[2]),std::stof(tokens[3])};
+            spMaterial->ambient = {std::stof(tokens[1]), std::stof(tokens[2]), std::stof(tokens[3])};
             break;
         case MaterialObjLibSymbols::diffuseColor:
-            spMaterial->diffuse = {std::stof(tokens[1]), std::stof(tokens[2]),std::stof(tokens[3])};
+            spMaterial->diffuse = {std::stof(tokens[1]), std::stof(tokens[2]), std::stof(tokens[3])};
             break;
         case MaterialObjLibSymbols::specularColor:
-            spMaterial->specular = {std::stof(tokens[1]), std::stof(tokens[2]),std::stof(tokens[3])};
+            spMaterial->specular = {std::stof(tokens[1]), std::stof(tokens[2]), std::stof(tokens[3])};
             break;
         case MaterialObjLibSymbols::ke_dontKnow:
             break;
@@ -150,7 +150,7 @@ void importMaterial(const std::string& materialFileName, Model* pModel) {
     }
 
     // Last Material has to be added
-    if(spMaterial != nullptr) {
+    if (spMaterial != nullptr) {
         pModel->AddMaterial(std::move(spMaterial));
     }
 }
@@ -212,7 +212,7 @@ std::pair<std::vector<VertexIndices>, FaceFormat> extractIndices(const std::vect
     return std::make_pair(vertexIndices, faceFormat);
 }
 
-void addFace(RenderUnit* pRenderUnit, const VertexData &rVertexData, const std::vector<VertexIndices> &rVertexIndices, FaceFormat fFormat) {
+void addFace(RenderUnit* pRenderUnit, const VertexData& rVertexData, const std::vector<VertexIndices>& rVertexIndices, FaceFormat fFormat) {
 
     std::vector<uint32_t> indexPositions;
     if (rVertexIndices.size() == 3) {
@@ -268,19 +268,19 @@ std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
     std::istringstream iss(buffer);
 
     for (std::string line; std::getline(iss, line);) {
-        if(line.size() == 0) {
+        if (line.size() == 0) {
             continue;
         }
 
         std::vector<std::string> tokens;
-        if(find(cbegin(line), cend(line), '\t') != cend(line)) {
+        if (find(cbegin(line), cend(line), '\t') != cend(line)) {
             tokenize(line, '\t', tokens);
         } else {
             tokenize(line, ' ', tokens);
         }
 
-        if(!objSymbolsMapping.contains(tokens[0])) {
-           continue;
+        if (!objSymbolsMapping.contains(tokens[0])) {
+            continue;
         }
         const auto symbol = objSymbolsMapping[tokens[0]];
         switch (symbol) {
@@ -298,7 +298,7 @@ std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
             importMaterial(tokens[1], spModel.get());
             break;
         case ObjFormatSymbols::useMaterial:
-            if(spRenderUnit != nullptr) {
+            if (spRenderUnit != nullptr) {
                 ASSERT(spRenderUnit->spMesh != nullptr)
                 spModel->AddRenderUnit(std::move(spRenderUnit));
                 spRenderUnit = nullptr;
@@ -322,8 +322,7 @@ std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
         case ObjFormatSymbols::face: {
             auto [vertexIndices, fFormat] = extractIndices(tokens);
             addFace(spRenderUnit.get(), vertexData, vertexIndices, fFormat);
-            }
-            break;
+        } break;
         default:
             Logger::GetInstance().GetLogger().info("{}: Token {} not implemented",
                                                    rRawData.GetFilePath().filename().string(),
@@ -334,7 +333,7 @@ std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
         }
     }
 
-    if(spRenderUnit != nullptr) {
+    if (spRenderUnit != nullptr) {
         ASSERT(spRenderUnit->spMesh != nullptr)
         spModel->AddRenderUnit(std::move(spRenderUnit));
         spRenderUnit = nullptr;
@@ -342,13 +341,13 @@ std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
         ASSERT(0)
     }
 
-//    Logger::GetInstance().GetLogger().info("{}: #Vertices: {}, #UVs: {}, #Normals: {}, #Faces: {}",
-//                                           rRawData.GetFilePath().filename().string(),
-//                                           vertices.size(),
-//                                           uvs.size(),
-//                                           normals.size(),
-//                                           spMesh->vertices.size() / 3);
-//
-//    spModel->SetMesh(std::move(spMesh));
+    //    Logger::GetInstance().GetLogger().info("{}: #Vertices: {}, #UVs: {}, #Normals: {}, #Faces: {}",
+    //                                           rRawData.GetFilePath().filename().string(),
+    //                                           vertices.size(),
+    //                                           uvs.size(),
+    //                                           normals.size(),
+    //                                           spMesh->vertices.size() / 3);
+    //
+    //    spModel->SetMesh(std::move(spMesh));
     return spModel;
 }

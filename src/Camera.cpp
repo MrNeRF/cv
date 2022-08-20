@@ -65,13 +65,13 @@ void Camera::UpdateCameraPosition(Eigen::Vector2d deltaCursorPos, double delta_t
         const Eigen::Vector3f camRight = (_up.cross(camDir)).normalized();
         const float sign = sgn(deltaCursorPos.y());
         float maxRotRad = 0.f;
-        if (sign < 0.f) {
+        if (sign > 0.f) {
             maxRotRad = -std::numbers::pi_v<float> + maxRotRadPerTimeInstance < rad_y ? -maxRotRadPerTimeInstance : -std::numbers::pi_v<float> - rad_y + epsilon;
         } else {
             maxRotRad = std::numbers::pi_v<float> - maxRotRadPerTimeInstance > rad_y ? maxRotRadPerTimeInstance : std::numbers::pi_v<float> - rad_y - epsilon;
         }
 
-        Eigen::Affine3f rot_pitch(Eigen::AngleAxis<float>(-maxRotRad, camRight));
+        Eigen::Affine3f rot_pitch(Eigen::AngleAxis<float>(maxRotRad, camRight));
         _eye = rot_pitch * _eye;
     }
 

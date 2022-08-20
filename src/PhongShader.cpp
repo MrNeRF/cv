@@ -10,8 +10,8 @@
 #include "Material.h"
 #include "Model.h"
 
-static const std::filesystem::path fragmentShaderName = "PhongFS.shader";
-static const std::filesystem::path vertexShaderName = "PhongVS.shader";
+static const std::filesystem::path fragmentShaderName = "phongFS.glsl";
+static const std::filesystem::path vertexShaderName = "phongVS.glsl";
 static const std::string shaderName = "PhongShader";
 
 PhongShader::PhongShader() : Shader(shaderName) {

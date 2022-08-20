@@ -1,7 +1,3 @@
-//
-// Created by paja on 6/22/22.
-//
-
 #ifndef CV_LIGHT_H
 #define CV_LIGHT_H
 

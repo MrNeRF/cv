@@ -5,8 +5,8 @@
 #include "ImageCanvas.h"
 #include <Eigen/Dense>
 #include "Logger.h"
-#include "Shader.h"
 #include "RenderUnit.h"
+#include "Shader.h"
 
 enum Position {
     POS_UPPER_LEFT = 0,
@@ -57,47 +57,47 @@ Eigen::Vector2f lowerRightUV = {1.f, 0.f};
 // faces(j, 4) = uv.y();
 
 ImageCanvas::ImageCanvas() {
-//
-//    _spMesh = std::make_unique<Mesh>();
-//    _spMesh->vertices.reserve(6);
-//    _spMesh->bHasUVs = true;
-//    _spMesh->bHasNormals = false;
-//
-//    Vertex v0, v1, v2, v3, v4, v5;
-//
-//    v0.position = upperLeftCorner;
-//    v0.uv = upperLeftUV;
-//
-//    v1.position = upperRightCorner;
-//    v1.uv = upperRightUV;
-//
-//    v2.position = lowerLeftCorner;
-//    v2.uv = lowerLeftUV;
-//
-//    v3.position = upperRightCorner;
-//    v3.uv = upperRightUV;
-//
-//    v4.position = lowerRightCorner;
-//    v4.uv = lowerRightUV;
-//
-//    v5.position = lowerLeftCorner;
-//    v5.uv = lowerLeftUV;
-//
-//    _spMesh->vertices.push_back(v0);
-//    _spMesh->vertices.push_back(v1);
-//    _spMesh->vertices.push_back(v2);
-//    _spMesh->vertices.push_back(v3);
-//    _spMesh->vertices.push_back(v4);
-//    _spMesh->vertices.push_back(v5);
+    //
+    //    _spMesh = std::make_unique<Mesh>();
+    //    _spMesh->vertices.reserve(6);
+    //    _spMesh->bHasUVs = true;
+    //    _spMesh->bHasNormals = false;
+    //
+    //    Vertex v0, v1, v2, v3, v4, v5;
+    //
+    //    v0.position = upperLeftCorner;
+    //    v0.uv = upperLeftUV;
+    //
+    //    v1.position = upperRightCorner;
+    //    v1.uv = upperRightUV;
+    //
+    //    v2.position = lowerLeftCorner;
+    //    v2.uv = lowerLeftUV;
+    //
+    //    v3.position = upperRightCorner;
+    //    v3.uv = upperRightUV;
+    //
+    //    v4.position = lowerRightCorner;
+    //    v4.uv = lowerRightUV;
+    //
+    //    v5.position = lowerLeftCorner;
+    //    v5.uv = lowerLeftUV;
+    //
+    //    _spMesh->vertices.push_back(v0);
+    //    _spMesh->vertices.push_back(v1);
+    //    _spMesh->vertices.push_back(v2);
+    //    _spMesh->vertices.push_back(v3);
+    //    _spMesh->vertices.push_back(v4);
+    //    _spMesh->vertices.push_back(v5);
 }
 
 void ImageCanvas::Render() {
-//    ASSERT(_spShader != nullptr);
-//    _spShader->ActivateShader(this);
+    //    ASSERT(_spShader != nullptr);
+    //    _spShader->ActivateShader(this);
 }
 
 Shader* ImageCanvas::AddShader(std::unique_ptr<Shader> spShader) {
-//    ASSERT(spShader != nullptr);
+    //    ASSERT(spShader != nullptr);
     _shader.push_back(std::move(spShader));
     return _shader.back().get();
 }

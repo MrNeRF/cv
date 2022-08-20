@@ -18,8 +18,8 @@ class ImageCanvas : public IRenderable {
     ImageCanvas();
 
     virtual Shader* AddShader(std::unique_ptr<Shader> spShader) override;
-    virtual const std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() const override {return _renderUnits;}
-    virtual std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() override {return _renderUnits;}
+    virtual const std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() const override { return _renderUnits; }
+    virtual std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() override { return _renderUnits; }
     void Render() override;
     const std::string& GetName() const override;
 

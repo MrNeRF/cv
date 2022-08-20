@@ -17,6 +17,7 @@ struct Transform
   vec4 qOrientation;
   vec4 qconjOrientation;
 };
+
 uniform Transform transform;
 
 vec4 quat_mult(vec4 q1, vec4 q2)

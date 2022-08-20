@@ -9,6 +9,7 @@
 #include "Viewer.h"
 
 class Camera;
+class Light;
 
 class Viewer3D : public Viewer {
    public:
@@ -21,6 +22,7 @@ class Viewer3D : public Viewer {
     void render();
 
    private:
+    std::shared_ptr<Light> _spLight;
     std::unique_ptr<Window> _spWindow;
     std::shared_ptr<Camera> _spCamera;
     Renderer _renderer;

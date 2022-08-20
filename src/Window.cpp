@@ -210,8 +210,7 @@ void KeyboardCallback(GLFWwindow* win, int key, int scancode, int action, int mo
 void Window::MouseDeviceUpdate(GLFWwindow* win, int button, int action, int mods) {
     if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_MIDDLE) {
         _updateMousePostion = true;
-    }
-    else if (action == GLFW_REPEAT && button == GLFW_MOUSE_BUTTON_MIDDLE) {
+    } else if (action == GLFW_REPEAT && button == GLFW_MOUSE_BUTTON_MIDDLE) {
     } else {
         _updateMousePostion = false;
     }

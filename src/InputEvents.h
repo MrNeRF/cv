@@ -45,6 +45,6 @@ namespace InputEvent {
         int action;
         int mods;
     };
-}
+}  // namespace InputEvent
 
 #endif  // CV_INPUTEVENTS_H

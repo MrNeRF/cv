@@ -2,13 +2,13 @@
 #define OPENGL_WINDOW_H
 
 #include <GLFW/glfw3.h>
+#include <Observer.h>
 #include <Eigen/Dense>
 #include <chrono>
 #include <cstdint>
 #include <list>
 #include <ratio>
 #include <string>
-#include <Observer.h>
 
 class Window : public Observer {
     using seconds = std::chrono::duration<double>;

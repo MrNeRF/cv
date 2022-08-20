@@ -21,10 +21,21 @@ Shader* Model::AddShader(std::unique_ptr<Shader> spShader) {
 
 const Material* Model::GetMaterial(const std::string& rMaterialName) const {
     for (const auto& spMaterial : _materials) {
-        return spMaterial.get();
+        if (spMaterial->materialName == rMaterialName) {
+            return spMaterial.get();
+        }
     }
     return nullptr;
 }
 void Model::AddRenderUnit(std::unique_ptr<RenderUnit> spRenderUnit) {
     _renderUnits.push_back(std::move(spRenderUnit));
+}
+
+void Model::Transform(const Eigen::Matrix3f& rTransformation) {
+    for (auto& spRenderUnit : _renderUnits) {
+        auto& rVertices = spRenderUnit->spMesh->vertices;
+        for (auto& rVertex : rVertices) {
+            rVertex.position = rTransformation * rVertex.position;
+        }
+    }
 }

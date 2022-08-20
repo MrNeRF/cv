@@ -15,20 +15,19 @@ void Renderer::AddRenderable(std::unique_ptr<IRenderable> spRenderObject) {
 }
 
 void Renderer::RemoveRenderable(const std::string& rName) {
-//    uint32_t uiPos = 0;
-//    for (auto& rData : _renderData) {
-//        if (rData.spRenderable->GetName() == rName) {
-//            _renderData.erase(_renderData.begin() + uiPos);
-//        } else {
-//            ++uiPos;
-//        }
-//    }
+    //    uint32_t uiPos = 0;
+    //    for (auto& rData : _renderData) {
+    //        if (rData.spRenderable->GetName() == rName) {
+    //            _renderData.erase(_renderData.begin() + uiPos);
+    //        } else {
+    //            ++uiPos;
+    //        }
+    //    }
 }
-void Renderer::UpdateTexture(const std::string& rName, const Texture* pTexture)
-{
-//    for (auto& rData : _renderData) {
-//        if (rData.spRenderable->GetName() == rName) {
-//            rData.openglData.UpdateTextureBuffer(pTexture);
-//        }
-//    }
+void Renderer::UpdateTexture(const std::string& rName, const Texture* pTexture) {
+    //    for (auto& rData : _renderData) {
+    //        if (rData.spRenderable->GetName() == rName) {
+    //            rData.openglData.UpdateTextureBuffer(pTexture);
+    //        }
+    //    }
 }

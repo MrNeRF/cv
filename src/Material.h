@@ -6,8 +6,8 @@
 #define CV_MATERIAL_H
 
 #include <Eigen/Dense>
-#include "Texture.h"
 #include <memory>
+#include "Texture.h"
 
 struct Material {
     std::string materialName;

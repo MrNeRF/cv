@@ -1,9 +1,8 @@
 #include "OpenGL3DDataObject.h"
 #include "Logger.h"
 #include "Mesh.h"
-#include "Texture.h"
 #include "RenderUnit.h"
-
+#include "Texture.h"
 
 OpenGL3DDataObject::OpenGL3DDataObject() {
     CHECK_GL_ERROR_(glGenVertexArrays(1, &_VAO));
@@ -17,17 +16,17 @@ OpenGL3DDataObject::~OpenGL3DDataObject(void) {
     CHECK_GL_ERROR_(glDeleteBuffers(1, &_VBO))
 }
 
-void OpenGL3DDataObject::InitializeBuffer(const Mesh *pMesh, const Texture *pTexture) {
+void OpenGL3DDataObject::InitializeBuffer(const Mesh* pMesh, const Texture* pTexture) {
     ASSERT(pMesh != nullptr)
     ASSERT(pMesh->vertices.size() > 0)
     initializeVertexData(*pMesh);
-    if(pTexture != nullptr) {
+    if (pTexture != nullptr) {
         initializeTextureData(pTexture);
     }
 }
 
 void OpenGL3DDataObject::initializeVertexData(const Mesh& mesh) {
-   _vertexRenderCount =mesh.vertices.size();
+    _vertexRenderCount = mesh.vertices.size();
     uint32_t dataCount = 3;
     dataCount += 2;
     dataCount += 3;
@@ -47,13 +46,12 @@ void OpenGL3DDataObject::initializeVertexData(const Mesh& mesh) {
     CHECK_GL_ERROR_(glBindBuffer(GL_ARRAY_BUFFER, _VBO))
     CHECK_GL_ERROR_(glBufferData(GL_ARRAY_BUFFER, _vertexRenderCount * sizeof(float) * dataCount, mesh.vertices.data(), GL_STATIC_DRAW))
 
-
     // vertices
     CHECK_GL_ERROR_(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, dataCount * sizeof(float), (void*)offsetof(Vertex, position)))
     CHECK_GL_ERROR_(glEnableVertexAttribArray(0))
 
     if (mesh.bHasUVs) {
-        CHECK_GL_ERROR_(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, dataCount * sizeof(float), (void*)offsetof(Vertex,uv)))
+        CHECK_GL_ERROR_(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, dataCount * sizeof(float), (void*)offsetof(Vertex, uv)))
         CHECK_GL_ERROR_(glEnableVertexAttribArray(1))
     }
 

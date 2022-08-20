@@ -4,8 +4,8 @@
 #include "Mesh.h"
 
 namespace algorithm {
-    static void ComputeSmoothNormals(Mesh* pMesh);
-    static void ComputeNonSmoothNormals(Mesh* pMesh);
+    [[maybe_unused]] static void ComputeSmoothNormals(Mesh* pMesh);
+    [[maybe_unused]] static void ComputeNonSmoothNormals(Mesh* pMesh);
 }  // namespace algorithm
 
 #endif

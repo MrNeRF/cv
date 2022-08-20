@@ -36,18 +36,22 @@ message(STATUS "Found GLEW in ${GLEW_INCLUDE_DIR}")
 set(MY_EXECUTABLE_SOURCES
     src/Camera.cpp
     src/CanvasShader.cpp
+    src/ColorShader.cpp
     src/File.cpp
     src/Logger.cpp
+    src/Light.cpp
     src/main.cpp
     src/Image.cpp
     src/ImageCanvas.cpp
 #    src/ImageViewer.cpp
     src/Importer.cpp
     src/Model.cpp
+    src/Normals.cpp
     src/ObjFileParser.cpp
     src/Observer.cpp
     src/OpenGL3DDataObject.cpp
     src/PhongShader.cpp
+    src/Primitives3D.cpp
     src/Renderer.cpp
     src/Shader.cpp
     src/stb_image.cpp

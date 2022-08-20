@@ -14,10 +14,11 @@ class OpenGL3DDataObject {
    public:
     OpenGL3DDataObject();
     ~OpenGL3DDataObject(void);
-    void InitializeBuffer(const Mesh *pMesh, const Texture *pTexture);
+    void InitializeBuffer(const Mesh* pMesh, const Texture* pTexture);
     void DrawObject(GLenum mode) const;
     void UpdateTextureBuffer(const Texture* pTexture);
-    private:
+
+   private:
     void initializeVertexData(const Mesh& mesh);
     void initializeTextureData(const Texture* pTexture);
 
