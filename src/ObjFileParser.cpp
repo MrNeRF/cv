@@ -86,7 +86,10 @@ static void tokenize(const std::string& line, char delim, std::vector<std::strin
     while (start != cend(line)) {
         const auto finish = find(++start, cend(line), delim);
 
-        tokens.push_back(std::string(start, finish));
+        if (start != finish) {
+            tokens.push_back(std::string(start, finish));
+        }
+
         start = finish;
     }
 }
@@ -100,6 +103,11 @@ void importMaterial(const std::string& materialFileName, Model* pModel) {
         if (line.size() == 0) {
             continue;
         }
+
+        if(line[0] == '\t') {
+            line = line.substr(1,line.size());
+        }
+
         std::vector<std::string> tokens;
         if (find(cbegin(line), cend(line), '\t') != cend(line)) {
             tokenize(line, '\t', tokens);
@@ -272,6 +280,22 @@ std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
             continue;
         }
 
+        const size_t lineLength =  line.size();
+        std::string tmpLine;
+        for(size_t i = 0; i < lineLength; ++i) {
+            switch(line[i]) {
+            case ' ':
+                if(i > 0 && line[i - 1] != ' ') {
+                    tmpLine += line[i];
+                }
+                break;
+            case '\r':
+                break;
+            default:
+                tmpLine += line[i];
+            }
+        }
+        line = tmpLine;
         std::vector<std::string> tokens;
         if (find(cbegin(line), cend(line), '\t') != cend(line)) {
             tokenize(line, '\t', tokens);
