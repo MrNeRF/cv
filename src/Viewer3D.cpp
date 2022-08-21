@@ -17,6 +17,9 @@ int Viewer3D::Init(void) {
     _spCamera = std::make_shared<Camera>();
     _spCamera->SetPerspectiveProjection(45.f, _spWindow->GetAspectRatio(), 0.1, 50.f);
     _spWindow->RegisterObserver(_spCamera, InputEvent::InputEventType::MouseWheel);
+    _spWindow->RegisterObserver(_spCamera, InputEvent::InputEventType::MouseButton);
+    _spWindow->RegisterObserver(_spCamera, InputEvent::InputEventType::WindowResize);
+    _spCamera->SetWindowSize(_spWindow->_winWidth, _spWindow->_winHeight);
     return _spWindow->Init();
 }
 
@@ -42,12 +45,16 @@ void Viewer3D::Run(void) {
             spPhongShader->SetName(renderUnit->pMaterial->materialName);
             renderUnit->pShader = spModel->AddShader(std::move(spPhongShader));
             renderUnit->spOpenGLData = std::make_unique<OpenGL3DDataObject>();
-
             renderUnit->InitializeRenderData();
             //            auto pModel = dynamic_cast<Model*>(spModel.get());
             //            pModel->SetPosition(Eigen::Vector4f(0.f, 1.f, 0.f, 1.f));
         }
-        _renderer.AddRenderable(std::move(spModel));
+        dynamic_cast<Model*>(spModel.get())->CreateBoundingVolumes(Primitives::Types::Cuboid);
+        dynamic_cast<Model*>(spModel.get())->SetName("RaceCar");
+
+        _renderer.AddRenderable(spModel.get());
+
+        _renderObjects.push_back(std::move(spModel));
     }
 
     {
@@ -66,27 +73,11 @@ void Viewer3D::Run(void) {
             //            auto pModel = dynamic_cast<Model*>(spModel.get());
             //            pModel->SetPosition(Eigen::Vector4f(0.f, 1.f, 0.f, 1.f));
         }
-        spModel->SetPosition(_spLight->GetPostion());
-        _renderer.AddRenderable(std::move(spModel));
+        dynamic_cast<Model*>(spModel.get())->CreateBoundingVolumes(Primitives::Types::Cuboid);
+        dynamic_cast<Model*>(spModel.get())->SetName("Light");
+        _renderer.AddRenderable(spModel.get());
+        _renderObjects.push_back(std::move(spModel));
     }
-
-    //    {
-    //        auto spModel2 = Importer::ImportModel("dice.obj");
-    //        auto& renderUnits2 = spModel2->GetRenderUnits();
-    //        for(auto &renderUnit : renderUnits2) {
-    //            auto spPhongShader = std::make_unique<PhongShader>();
-    //            spPhongShader->SetLightSource(std::make_shared<Light>());
-    //            spPhongShader->SetMaterial(*renderUnit->pMaterial);
-    //            spPhongShader->SetCamera(_spCamera);
-    //            spPhongShader->SetName(renderUnit->pMaterial->materialName);
-    //            renderUnit->pShader = spModel2->AddShader(std::move(spPhongShader));
-    //            renderUnit->spOpenGLData = std::make_unique<OpenGL3DDataObject>();
-    //            renderUnit->InitializeRenderData();
-    //            auto pModel = dynamic_cast<Model*>(spModel2.get());
-    //            pModel->SetPosition(Eigen::Vector4f(0.f, -1.f, 0.f, 1.f));
-    //        }
-    //        _renderer.AddRenderable(std::move(spModel2));
-    //    }
 
     CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));
     render();
@@ -111,6 +102,12 @@ void Viewer3D::render() {
         // UpdatePositions
         _spCamera->UpdateCameraPosition(_spWindow->GetCursorPostionDelta(), 1. / static_cast<double>(fps));
         // Draw
+        for (auto& spRenderAble : _renderObjects) {
+            auto spObject = dynamic_cast<Model*>(spRenderAble.get());
+            if (spObject != nullptr) {
+                spObject->CheckCollision(_spCamera.get());
+            }
+        }
         _renderer.Render();
         glfwSwapBuffers(_spWindow->GetGLFWWindow());
 

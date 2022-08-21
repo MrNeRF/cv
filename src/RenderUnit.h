@@ -8,6 +8,7 @@
 #include <Material.h>
 #include <Mesh.h>
 #include <memory>
+#include "BoundingVolume.h"
 #include "OpenGL3DDataObject.h"
 #include "Shader.h"
 
@@ -16,6 +17,7 @@ struct RenderUnit {
     Shader* pShader = nullptr;
     const Material* pMaterial = nullptr;
     std::unique_ptr<OpenGL3DDataObject> spOpenGLData;
+    collision::BoundingVolume bv;
 
     void InitializeRenderData() {
         if (pMaterial != nullptr && pMaterial->spTexure != nullptr) {

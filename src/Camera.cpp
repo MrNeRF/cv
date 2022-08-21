@@ -81,10 +81,32 @@ void Camera::UpdateCameraPosition(Eigen::Vector2d deltaCursorPos, double delta_t
     }
 }
 void Camera::Update(const InputEvent::IEvent& rEvent) {
-    const auto& event = dynamic_cast<const InputEvent::MouseWheel&>(rEvent);
-    _fov -= static_cast<float>(event.yOffeset) * .05f;
-    std::cout << _fov << "\n";
-    SetPerspectiveProjection(_fov, _aspectRatio, _zNear, _zFar);
+    switch (rEvent.eventType) {
+    case InputEvent::InputEventType::MouseButton: {
+        const auto& event = dynamic_cast<const InputEvent::MouseButton&>(rEvent);
+        const auto NDC = Eigen::Vector2f(2.f * event.cursorPosition(0) / _windowSize(0), 2.f * event.cursorPosition(1) / _windowSize(1));
+        const auto pixelScreen = Eigen::Vector2f(NDC[0] - 1, 1 - NDC[1]);
+        const Eigen::Vector4f ray_clipped = Eigen::Vector4f(pixelScreen[0], pixelScreen[1], -1, 1);
+        Eigen::Vector4f ray_eye = _frustum.inverse() * ray_clipped;
+        ray_eye = Eigen::Vector4f(ray_eye.x(), ray_eye.y(), -1.f, 0.f);
+
+        Eigen::Vector4f ray_world4f = (GetLookAt().inverse() * ray_eye);
+        Eigen::Vector3f ray_world = Eigen::Vector3f(ray_world4f.x(), ray_world4f.y(), ray_world4f.z()).normalized();
+        _cameraRay = Ray(_eye, ray_world, 0.f);
+    } break;
+    case InputEvent::InputEventType::MouseWheel: {
+        const auto& event = dynamic_cast<const InputEvent::MouseWheel&>(rEvent);
+        _fov -= static_cast<float>(event.yOffeset) * .05f;
+        std::cout << _fov << "\n";
+        SetPerspectiveProjection(_fov, _aspectRatio, _zNear, _zFar);
+    } break;
+    case InputEvent::InputEventType::WindowResize: {
+        const auto& event = dynamic_cast<const InputEvent::WindowResize&>(rEvent);
+        _windowSize = Eigen::Vector2i(event.width, event.height);
+    } break;
+    default:
+        break;
+    }
 }
 
 Eigen::Matrix4f ComputeFrustum(float left, float right, float bottom, float top, float near, float far) {

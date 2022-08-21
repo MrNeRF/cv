@@ -106,7 +106,6 @@ void OpenGL3DDataObject::DrawObject(GLenum mode) const {
         glBindTexture(GL_TEXTURE_2D, _Texture1);
     }
 
-    std::cout << "Bind vertex array " << _VAO << '\n';
     CHECK_GL_ERROR_(glBindVertexArray(_VAO))
     CHECK_GL_ERROR_(glDrawArrays(mode, 0, _vertexRenderCount))
     CHECK_GL_ERROR_(glBindVertexArray(0))

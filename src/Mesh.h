@@ -10,6 +10,8 @@
 #include "Eigen/Dense"
 #include "Material.h"
 
+struct Ray;
+
 struct Vertex {
     Eigen::Vector3f position;
     Eigen::Vector2f uv;
@@ -18,10 +20,10 @@ struct Vertex {
 };
 
 struct Mesh {
+    Mesh() {}
     std::vector<Vertex> vertices;
     bool bHasNormals = false;
     bool bHasUVs = false;
     bool bHasColor = false;
 };
-
-#endif  // LEARNOPENGL_MESH_H
+#endif

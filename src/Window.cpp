@@ -165,6 +165,10 @@ void Window::ViewPortUpdate(int width, int height) {
 
 void WindowResizeCallback(GLFWwindow* win, int h, int w) {
     Window* window = static_cast<Window*>(glfwGetWindowUserPointer(win));
+    InputEvent::WindowResize event;
+    event.width = w;
+    event.height = h;
+    window->AddEvent(event);
     window->ViewPortUpdate(w, h);
 }
 
@@ -174,6 +178,7 @@ void MouseInputCallback(GLFWwindow* win, int button, int action, int mods) {
     event.button = button;
     event.action = action;
     event.mods = mods;
+    event.cursorPosition = window->GetCursorPostion();
     window->AddEvent(event);
     window->MouseDeviceUpdate(win, button, action, mods);
 }

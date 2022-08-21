@@ -10,7 +10,7 @@ void Renderer::Render() {
     }
 }
 
-void Renderer::AddRenderable(std::unique_ptr<IRenderable> spRenderObject) {
+void Renderer::AddRenderable(IRenderable* spRenderObject) {
     _renderingObjects.push_back(std::move(spRenderObject));
 }
 

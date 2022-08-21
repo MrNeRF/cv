@@ -6,11 +6,13 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "BoundingVolume.h"
 #include "Camera.h"
 #include "Eigen/src/Geometry/AngleAxis.h"
 #include "Eigen/src/Geometry/Quaternion.h"
 #include "IRenderable.h"
 #include "Material.h"
+#include "Primitives.h"
 #include "RenderUnit.h"
 
 class Shader;
@@ -23,6 +25,8 @@ class Model : public IRenderable {
     std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() override { return _renderUnits; };
     void AddMaterial(std::unique_ptr<Material> spMaterial) { _materials.push_back(std::move(spMaterial)); };
     const Material* GetMaterial(const std::string& rMaterialName) const;
+    void CreateBoundingVolumes(Primitives::Types bvType);
+    void CheckCollision(const Camera* pCamera);
 
     void Render() override;
     [[nodiscard]] const std::string& GetName() const override { return _name; }

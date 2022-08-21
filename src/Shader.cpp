@@ -91,7 +91,5 @@ void Shader::checkCompileErrors(unsigned int shaderID, const Shader::ShaderType&
 }
 
 void Shader::activateShader() {
-    auto& rLogger = Logger::GetInstance().GetLogger();
-    rLogger.info("Activate Shader with program id {}", _shaderProgramID);
     { CHECK_GL_ERROR_(glUseProgram(_shaderProgramID)); }
 }

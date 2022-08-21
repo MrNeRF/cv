@@ -11,9 +11,6 @@
 #include <string>
 
 class Window : public Observer {
-    using seconds = std::chrono::duration<double>;
-    using milliseconds = std::chrono::duration<double, std::ratio_multiply<seconds::period, std::milli>>;
-
    public:
     explicit Window(const std::string& name) : Window{name, 800, 800} {}
     explicit Window(const std::string& name, int height, int width) : _windowName{name},
@@ -31,6 +28,7 @@ class Window : public Observer {
     }
 
     Eigen::Vector2d GetCursorPostionDelta();
+    Eigen::Vector2d GetCursorPostion() { return _lastCursorPostion; };
 
     GLFWwindow* GetGLFWWindow(void) { return _windowInstance; }
 

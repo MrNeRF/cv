@@ -15,12 +15,12 @@ struct Texture;
 class Renderer {
    public:
     void Render();
-    void AddRenderable(std::unique_ptr<IRenderable> spRenderObject);
+    void AddRenderable(IRenderable* spRenderObject);
     void RemoveRenderable(const std::string& rName);
     void UpdateTexture(const std::string& rName, const Texture* pTexture);
 
    private:
-    std::vector<std::unique_ptr<IRenderable>> _renderingObjects;
+    std::vector<IRenderable*> _renderingObjects;
 };
 
 #endif  // CV_RENDERER_H

@@ -5,12 +5,15 @@
 #ifndef CV_INPUTEVENTS_H
 #define CV_INPUTEVENTS_H
 
+#include <Eigen/Dense>
+
 namespace InputEvent {
     enum class InputEventType {
+        KeyBoard,
         MouseButton,
-        MouseWheel,
         MouseCursor,
-        KeyBoard
+        MouseWheel,
+        WindowResize,
     };
 
     struct IEvent {
@@ -18,12 +21,18 @@ namespace InputEvent {
         virtual ~IEvent() = default;
         InputEventType eventType;
     };
+    struct WindowResize : public IEvent {
+        WindowResize() : IEvent(InputEventType::WindowResize) {}
+        int width;
+        int height;
+    };
 
     struct MouseButton : public IEvent {
         MouseButton() : IEvent(InputEventType::MouseButton) {}
         int button;
         int action;
         int mods;
+        Eigen::Vector2d cursorPosition;
     };
 
     struct MouseWheel : public IEvent {

@@ -13,9 +13,9 @@ class Light;
 
 class Viewer3D : public Viewer {
    public:
-    Viewer3D(const std::string windowName) : _spWindow{std::make_unique<Window>(windowName)} {}
+    explicit Viewer3D(const std::string& windowName) : _spWindow{std::make_unique<Window>(windowName)} {}
     int Init() override;
-    void Run(void);
+    void Run();
     void SetBackgroundColor(const Eigen::Vector4f& color) { _backgroundColor = color; }
 
    private:
@@ -25,6 +25,7 @@ class Viewer3D : public Viewer {
     std::shared_ptr<Light> _spLight;
     std::unique_ptr<Window> _spWindow;
     std::shared_ptr<Camera> _spCamera;
+    std::vector<std::unique_ptr<IRenderable>> _renderObjects;
     Renderer _renderer;
     Eigen::Vector4f _backgroundColor;
 };

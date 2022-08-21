@@ -169,7 +169,7 @@ namespace collision {
         _spBoundingVolume = std::make_unique<Sphere>(recursiveMB(input, bound));
     }
 
-    bool BoundingVolume::HasCollion(const Ray& rRay) {
+    bool BoundingVolume::HasCollison(const Ray& rRay) const {
         bool bHasCollison = false;
         switch (_bvType) {
         case Primitives::Types::Sphere:
@@ -183,7 +183,7 @@ namespace collision {
         return bHasCollison;
     }
 
-    bool BoundingVolume::HasCollion(const BoundingVolume& rBV) {
+    bool BoundingVolume::HasCollison(const BoundingVolume& rBV) const {
         bool bHasCollison = false;
         switch (_bvType) {
         case Primitives::Types::Sphere: {
@@ -195,8 +195,8 @@ namespace collision {
                 bHasCollison = HasCollision(dynamic_cast<const Sphere&>(*_spBoundingVolume), dynamic_cast<const Cuboid&>(*rBV.GetBoundingVolume()));
                 break;
             }
-            break;
-        case Primitives::Types::Cuboid:
+        } break;
+        case Primitives::Types::Cuboid: {
             switch (rBV._bvType) {
             case Primitives::Types::Sphere:
                 bHasCollison = HasCollision(dynamic_cast<const Cuboid&>(*_spBoundingVolume), dynamic_cast<const Sphere&>(*rBV.GetBoundingVolume()));
@@ -205,13 +205,49 @@ namespace collision {
                 bHasCollison = HasCollision(dynamic_cast<const Cuboid&>(*_spBoundingVolume), dynamic_cast<const Cuboid&>(*rBV.GetBoundingVolume()));
                 break;
             }
-            break;
-        }
+        } break;
         }
         return bHasCollison;
     }
 
     void BoundingVolume::Draw() {
+    }
+
+    bool MeshRayCollision(const Mesh& rMesh, const Ray& rRay, const Eigen::Vector3f& position, const Eigen::Matrix3f& model, const collision::BoundingVolume& rBV) {
+        if (!rBV.HasCollison(rRay)) {
+            return false;
+        }
+
+        for (size_t idx = 0; idx < rMesh.vertices.size(); idx += 3) {
+            Eigen::Vector3f vec0 = rMesh.vertices[idx].position;
+            Eigen::Vector3f vec1 = rMesh.vertices[idx + 1].position;
+            Eigen::Vector3f vec2 = rMesh.vertices[idx + 2].position;
+            vec0 = model * vec0 + position;
+            vec1 = model * vec1 + position;
+            vec2 = model * vec2 + position;
+            Eigen::Vector3f vecA = vec1 - vec0;
+            Eigen::Vector3f vecB = vec2 - vec0;
+            Eigen::Vector3f pVec = rRay._direction.cross(vecB);
+            float det = vecA.dot(pVec);
+            if (std::abs(det) < std::numeric_limits<float>::epsilon()) {
+                continue;
+            }
+            const float invDet = 1.f / det;
+            Eigen::Vector3f tvec = rRay._origin - vec0;
+            const float u = tvec.dot(pVec) * invDet;
+            if (u < 0.f || u > 1.f) {
+                continue;
+            }
+
+            const Eigen::Vector3f qvec = tvec.cross(vecA);
+            const float v = rRay._direction.dot(qvec) * invDet;
+            if ((v < 0) || u + v > 1.f) {
+                continue;
+            }
+            std::cout << "Object hit" << std::endl;
+            return true;
+        }
+        return false;
     }
 
 }  // namespace collision

@@ -19,11 +19,12 @@ namespace collision {
         };
 
        public:
+        BoundingVolume() = default;
         BoundingVolume(const Primitives::Types& type, const Mesh& rMeshToBV);
         [[nodiscard]] const Primitives* GetBoundingVolume() const { return _spBoundingVolume.get(); };
 
-        bool HasCollion(const Ray& rRay);
-        bool HasCollion(const BoundingVolume& rBV);
+        bool HasCollison(const Ray& rRay) const;
+        bool HasCollison(const BoundingVolume& rBV) const;
         void Draw();
 
        private:
@@ -34,6 +35,8 @@ namespace collision {
         Primitives::Types _bvType;
         std::unique_ptr<Primitives> _spBoundingVolume;
     };
+
+    bool MeshRayCollision(const Mesh& rMesh, const Ray& rRay, const Eigen::Vector3f& position, const Eigen::Matrix3f& model, const collision::BoundingVolume& rBV);
 }  // namespace collision
 
 #endif
