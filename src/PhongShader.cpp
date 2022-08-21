@@ -29,16 +29,16 @@ void PhongShader::SetMaterial(const Material& rMaterial) {
     SetValue("material.specularExponent", rMaterial.specularExponent);
 }
 
-void PhongShader::SetLightSource(std::shared_ptr<Light> spLight) {
-    if (spLight == nullptr) {
+void PhongShader::SetLightSource(Light* pLight) {
+    if (pLight == nullptr) {
         return;
     }
     Shader::activateShader();
-    _spLight = spLight;
-    SetVector("light.ambient", _spLight->GetAmbient());
-    SetVector("light.diffuse", _spLight->GetDiffuse());
-    SetVector("light.specular", _spLight->GetSpecular());
-    SetVector("light.position", _spLight->GetPostion());
+    _pLight = pLight;
+    SetVector("light.ambient", _pLight->GetAmbient());
+    SetVector("light.diffuse", _pLight->GetDiffuse());
+    SetVector("light.specular", _pLight->GetSpecular());
+    SetVector("light.position", _pLight->GetPostion());
 }
 
 void PhongShader::SetCamera(std::shared_ptr<Camera> spCamera) {
@@ -49,7 +49,7 @@ void PhongShader::SetCamera(std::shared_ptr<Camera> spCamera) {
 }
 
 void PhongShader::ActivateShader(const IRenderable* pRenderObject) {
-    if (_spLight == nullptr) {
+    if (_pLight == nullptr) {
         Logger::GetInstance().GetLogger().warn("Light not set in shader {}", shaderName);
     }
     if (_spCamera == nullptr) {

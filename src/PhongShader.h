@@ -21,13 +21,13 @@ class PhongShader : public Shader {
 
     void ActivateShader(const IRenderable* pRenderObject) override;
     void SetMaterial(const Material& rMaterial);
-    void SetLightSource(std::shared_ptr<Light> spLight);
-    std::shared_ptr<Light> GetLightSource() { return _spLight; };
+    void SetLightSource(Light* pLight);
+    const Light* GetLightSource() { return _pLight; };
     void SetCamera(std::shared_ptr<Camera> spCamera);
 
    private:
     std::string _name;
-    std::shared_ptr<Light> _spLight;
+    Light* _pLight;
     std::shared_ptr<Camera> _spCamera;
 };
 

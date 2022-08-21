@@ -13,7 +13,21 @@
 #include "Primitives3D.h"
 
 int Viewer3D::Init(void) {
-    _spLight = std::make_shared<Light>();
+    _spSceneGraph = std::make_unique<scene::SceneGraph>();
+    auto spNodeGroup = std::make_unique<scene::Node>("LightGroup");
+    scene::Node* pParentNode = _spSceneGraph->InserNode(nullptr, std::move(spNodeGroup));
+
+    auto spNode = std::make_unique<scene::Node>("Light");
+    spNode->renderable = std::make_unique<Light>("Light");
+    spNode->pParent = pParentNode;
+    _spSceneGraph->InserNode(pParentNode, std::move(spNode));
+
+    spNode = std::make_unique<scene::Node>("CameraGroup");
+    pParentNode = _spSceneGraph->InserNode(nullptr, std::move(spNode));
+
+    spNode = std::make_unique<scene::Node>("ModelGroup");
+    pParentNode = _spSceneGraph->InserNode(nullptr, std::move(spNode));
+
     _spCamera = std::make_shared<Camera>();
     _spCamera->SetPerspectiveProjection(45.f, _spWindow->GetAspectRatio(), 0.1, 50.f);
     _spWindow->RegisterObserver(_spCamera, InputEvent::InputEventType::MouseWheel);
@@ -39,7 +53,7 @@ void Viewer3D::Run(void) {
         auto& renderUnits = spModel->GetRenderUnits();
         for (auto& renderUnit : renderUnits) {
             auto spPhongShader = std::make_unique<PhongShader>();
-            spPhongShader->SetLightSource(_spLight);
+            spPhongShader->SetLightSource(dynamic_cast<Light*>(_spSceneGraph->GetNode("Light")->renderable.get()));
             spPhongShader->SetMaterial(*renderUnit->pMaterial);
             spPhongShader->SetCamera(_spCamera);
             spPhongShader->SetName(renderUnit->pMaterial->materialName);
