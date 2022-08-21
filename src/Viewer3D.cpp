@@ -9,6 +9,7 @@
 #include "Logger.h"
 #include "Model.h"
 #include "PhongShader.h"
+#include "Primitives.h"
 #include "Primitives3D.h"
 
 int Viewer3D::Init(void) {
@@ -27,11 +28,11 @@ void Viewer3D::Run(void) {
         auto spModel = Importer::ImportModel("racecar.obj");
         //        auto spModel = Importer::ImportModel("dice.obj");
 
-//        Eigen::Matrix3f scale;
-//        scale(0, 0) = 5.f;
-//        scale(1, 1) = 5.f;
-//        scale(2, 2) = 5.f;
-//        dynamic_cast<Model*>(spModel.get())->Transform(scale);
+        //        Eigen::Matrix3f scale;
+        //        scale(0, 0) = 5.f;
+        //        scale(1, 1) = 5.f;
+        //        scale(2, 2) = 5.f;
+        //        dynamic_cast<Model*>(spModel.get())->Transform(scale);
         auto& renderUnits = spModel->GetRenderUnits();
         for (auto& renderUnit : renderUnits) {
             auto spPhongShader = std::make_unique<PhongShader>();
@@ -52,7 +53,7 @@ void Viewer3D::Run(void) {
     {
         auto spModel = std::make_unique<Model>();
         auto spRenderUnit = std::make_unique<RenderUnit>();
-        spRenderUnit->spMesh = Primitives3D::CreateCube(1.f, 1.f, 1.f);
+        spRenderUnit->spMesh = algorithm::PrimitiveToMesh(Cuboid());
         spModel->AddRenderUnit(std::move(spRenderUnit));
         auto& renderUnits = spModel->GetRenderUnits();
         for (auto& renderUnit : renderUnits) {

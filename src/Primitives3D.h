@@ -3,10 +3,10 @@
 
 #include <memory>
 #include "Mesh.h"
+#include "Primitives.h"
 
-class Primitives3D {
-   public:
-    static std::unique_ptr<Mesh> CreateCube(const int32_t width, const int32_t height, const int32_t depth);
-};
+namespace algorithm {
+    std::unique_ptr<Mesh> PrimitiveToMesh(const Primitives& rPrimitive);
+}
 
 #endif

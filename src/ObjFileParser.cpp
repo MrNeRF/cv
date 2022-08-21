@@ -104,8 +104,8 @@ void importMaterial(const std::string& materialFileName, Model* pModel) {
             continue;
         }
 
-        if(line[0] == '\t') {
-            line = line.substr(1,line.size());
+        if (line[0] == '\t') {
+            line = line.substr(1, line.size());
         }
 
         std::vector<std::string> tokens;
@@ -280,12 +280,12 @@ std::unique_ptr<Model> ObjFileParser::ImportModel(const File& rRawData) {
             continue;
         }
 
-        const size_t lineLength =  line.size();
+        const size_t lineLength = line.size();
         std::string tmpLine;
-        for(size_t i = 0; i < lineLength; ++i) {
-            switch(line[i]) {
+        for (size_t i = 0; i < lineLength; ++i) {
+            switch (line[i]) {
             case ' ':
-                if(i > 0 && line[i - 1] != ' ') {
+                if (i > 0 && line[i - 1] != ' ') {
                     tmpLine += line[i];
                 }
                 break;

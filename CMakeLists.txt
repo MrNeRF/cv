@@ -34,6 +34,7 @@ find_package(GLEW REQUIRED)
 message(STATUS "Found GLEW in ${GLEW_INCLUDE_DIR}")
 
 set(MY_EXECUTABLE_SOURCES
+    src/BoundingVolume.cpp
     src/Camera.cpp
     src/CanvasShader.cpp
     src/ColorShader.cpp
@@ -51,6 +52,7 @@ set(MY_EXECUTABLE_SOURCES
     src/Observer.cpp
     src/OpenGL3DDataObject.cpp
     src/PhongShader.cpp
+    src/Primitives.cpp
     src/Primitives3D.cpp
     src/Renderer.cpp
     src/Shader.cpp
