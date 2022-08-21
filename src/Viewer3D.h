@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <string>
+#include "SceneGraph.h"
 #include "Viewer.h"
 
 class Camera;
@@ -22,6 +23,7 @@ class Viewer3D : public Viewer {
     void render();
 
    private:
+    std::unique_ptr<scene::SceneGraph> _spSceneGraph;
     std::shared_ptr<Light> _spLight;
     std::unique_ptr<Window> _spWindow;
     std::shared_ptr<Camera> _spCamera;

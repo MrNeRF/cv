@@ -55,6 +55,7 @@ set(MY_EXECUTABLE_SOURCES
     src/Primitives.cpp
     src/Primitives3D.cpp
     src/Renderer.cpp
+    src/SceneGraph.cpp
     src/Shader.cpp
     src/stb_image.cpp
     src/Texture.cpp
