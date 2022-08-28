@@ -21,6 +21,8 @@ class Camera : public IObserver {
     const Eigen::Vector3f& GetCameraPosition() const { return _eye; }
     const Ray& GetCameraRay() const { return _cameraRay; }
     void UpdateCameraPosition(Eigen::Vector2d deltaCursorPos, double delta_time);
+    float GetFarPlaneValue() const { return _zFar; }
+    float GetNearPlaneValue() const { return _zNear; }
 
     // Observer
     void Update(const InputEvent::IEvent& rEvent) override;
@@ -30,7 +32,7 @@ class Camera : public IObserver {
     float _zNear = 1.f;
     float _zFar = 50.f;
     float _aspectRatio = 0.75f;
-    Eigen::Vector3f _eye = Eigen::Vector3f(0.f, 0.f, 12.f);
+    Eigen::Vector3f _eye = Eigen::Vector3f(0.f, 3.f, 12.f);
     Eigen::Vector3f _target = Eigen::Vector3f(0.f, 0.f, 0.f);
     Eigen::Vector3f _up = Eigen::Vector3f(0.f, 1.f, 0.f);
     Eigen::Matrix4f _frustum;

@@ -129,3 +129,10 @@ Sphere& Sphere::operator=(Sphere rSphere) {
     std::swap(_center, rSphere._center);
     return *this;
 }
+
+Plane::Plane() : Plane(1.f, 1.f) {
+}
+
+Plane::Plane(float width, float depth) : Primitives(Primitives::Types::Plane),
+                                         _width{width},
+                                         _depth{depth} {}

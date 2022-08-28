@@ -13,7 +13,7 @@
 namespace scene {
     struct Node {
         Node() = default;
-        explicit Node(std::string rNodeName) : name{std::move(rNodeName)}{}
+        explicit Node(std::string rNodeName) : name{std::move(rNodeName)} {}
         std::string name;
         std::unique_ptr<IRenderable> renderable;
         Node* pParent = nullptr;

@@ -39,6 +39,7 @@ set(MY_EXECUTABLE_SOURCES
     src/CanvasShader.cpp
     src/ColorShader.cpp
     src/File.cpp
+    src/GridFloorShader.cpp
     src/Logger.cpp
     src/Light.cpp
     src/main.cpp

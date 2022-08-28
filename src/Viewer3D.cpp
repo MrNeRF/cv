@@ -4,6 +4,7 @@
 #include <memory>
 #include "Camera.h"
 #include "ColorShader.h"
+#include "GridFloorShader.h"
 #include "Importer.h"
 #include "Light.h"
 #include "Logger.h"
@@ -51,6 +52,10 @@ void Viewer3D::Run(void) {
         //        scale(2, 2) = 5.f;
         //        dynamic_cast<Model*>(spModel.get())->Transform(scale);
         auto& renderUnits = spModel->GetRenderUnits();
+        const Eigen::Affine3f rotation(Eigen::AngleAxis<float>(-std::numbers::pi_v<float> * 0.5f, Eigen::Vector3f::UnitX()));
+        auto pModel = dynamic_cast<Model*>(spModel.get());
+        pModel->Transform(rotation.rotation());
+        pModel->SetPosition(Eigen::Vector4f(0.f, 1.f, 0.f, 1.f));
         for (auto& renderUnit : renderUnits) {
             auto spPhongShader = std::make_unique<PhongShader>();
             spPhongShader->SetLightSource(dynamic_cast<Light*>(_spSceneGraph->GetNode("Light")->renderable.get()));
@@ -60,8 +65,6 @@ void Viewer3D::Run(void) {
             renderUnit->pShader = spModel->AddShader(std::move(spPhongShader));
             renderUnit->spOpenGLData = std::make_unique<OpenGL3DDataObject>();
             renderUnit->InitializeRenderData();
-            //            auto pModel = dynamic_cast<Model*>(spModel.get());
-            //            pModel->SetPosition(Eigen::Vector4f(0.f, 1.f, 0.f, 1.f));
         }
         dynamic_cast<Model*>(spModel.get())->CreateBoundingVolumes(Primitives::Types::Cuboid);
         dynamic_cast<Model*>(spModel.get())->SetName("RaceCar");
@@ -76,6 +79,8 @@ void Viewer3D::Run(void) {
         auto spRenderUnit = std::make_unique<RenderUnit>();
         spRenderUnit->spMesh = algorithm::PrimitiveToMesh(Cuboid());
         spModel->AddRenderUnit(std::move(spRenderUnit));
+        auto pModel = dynamic_cast<Model*>(spModel.get());
+        pModel->SetPosition(Eigen::Vector4f(0.f, 4.f, 2.f, 1.f));
         auto& renderUnits = spModel->GetRenderUnits();
         for (auto& renderUnit : renderUnits) {
             auto spShader = std::make_unique<ColorShader>(Eigen::Vector4f(1.f, 1.f, 1.f, 1.f));
@@ -84,8 +89,6 @@ void Viewer3D::Run(void) {
             renderUnit->pShader = spModel->AddShader(std::move(spShader));
             renderUnit->spOpenGLData = std::make_unique<OpenGL3DDataObject>();
             renderUnit->InitializeRenderData();
-            //            auto pModel = dynamic_cast<Model*>(spModel.get());
-            //            pModel->SetPosition(Eigen::Vector4f(0.f, 1.f, 0.f, 1.f));
         }
         dynamic_cast<Model*>(spModel.get())->CreateBoundingVolumes(Primitives::Types::Cuboid);
         dynamic_cast<Model*>(spModel.get())->SetName("Light");
@@ -93,6 +96,29 @@ void Viewer3D::Run(void) {
         _renderObjects.push_back(std::move(spModel));
     }
 
+    {
+        auto spModel = std::make_unique<Model>();
+        auto spRenderUnit = std::make_unique<RenderUnit>();
+        spRenderUnit->spMesh = algorithm::PrimitiveToMesh(Plane(2.f, 2.f));
+        spModel->AddRenderUnit(std::move(spRenderUnit));
+        auto pModel = dynamic_cast<Model*>(spModel.get());
+        const Eigen::Affine3f rotation(Eigen::AngleAxis<float>(-std::numbers::pi_v<float> * 0.5f, Eigen::Vector3f::UnitX()));
+        pModel->Transform(rotation.rotation());
+        auto& renderUnits = spModel->GetRenderUnits();
+        for (auto& renderUnit : renderUnits) {
+            //            auto spShader = std::make_unique<ColorShader>(Eigen::Vector4f(1.f, 1.f, 1.f, 1.f));
+            auto spShader = std::make_unique<GridFloorShader>();
+            spShader->SetCamera(_spCamera);
+            spShader->SetName("GridShader");
+            renderUnit->pShader = spModel->AddShader(std::move(spShader));
+            renderUnit->spOpenGLData = std::make_unique<OpenGL3DDataObject>();
+            renderUnit->InitializeRenderData();
+        }
+        dynamic_cast<Model*>(spModel.get())->CreateBoundingVolumes(Primitives::Types::Cuboid);
+        dynamic_cast<Model*>(spModel.get())->SetName("FloorGrid");
+        _renderer.AddRenderable(spModel.get());
+        _renderObjects.push_back(std::move(spModel));
+    }
     CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));
     render();
 }

@@ -6,17 +6,17 @@
 
 namespace scene {
     static Node* FindNode(Node* pNode, const std::string& rNodeName) {
-        if(pNode == nullptr ) {
+        if (pNode == nullptr) {
             return nullptr;
         }
-        if(pNode->name == rNodeName) {
+        if (pNode->name == rNodeName) {
             return pNode;
-        } else if(pNode->children.size() == 0) {
+        } else if (pNode->children.size() == 0) {
             return nullptr;
         } else {
             for (auto& spChild : pNode->children) {
                 Node* pResult = FindNode(spChild.get(), rNodeName);
-                if(pResult != nullptr && pResult->name == rNodeName) {
+                if (pResult != nullptr && pResult->name == rNodeName) {
                     return pResult;
                 }
             }
@@ -24,7 +24,6 @@ namespace scene {
 
         return nullptr;
     }
-
 
     SceneGraph::SceneGraph() : _rootNode{std::make_unique<Node>()} {
         _rootNode->name = "Root";
@@ -58,8 +57,8 @@ namespace scene {
     }
 
     Node* SceneGraph::GetNode(const std::string& rNodeName) {
-        if(_rootNode == nullptr) {
-            ASSERT(0) // Something went most likely wrong. Please debug.
+        if (_rootNode == nullptr) {
+            ASSERT(0)  // Something went most likely wrong. Please debug.
             return nullptr;
         }
         return FindNode(_rootNode.get(), rNodeName);

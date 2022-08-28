@@ -11,7 +11,8 @@ class Primitives {
    public:
     enum class Types {
         Sphere,
-        Cuboid
+        Cuboid,
+        Plane
     };
 
     explicit Primitives(Types type) : _type{type} {};
@@ -57,4 +58,15 @@ class Sphere : public Primitives {
     float _radius{};
 };
 
+class Plane : public Primitives {
+   public:
+    explicit Plane();
+    explicit Plane(float width, float depth);
+    float GetWidth() const { return _width; };
+    float GetDepth() const { return _depth; };
+
+   private:
+    float _width;
+    float _depth;
+};
 #endif  // CV_PRIMITIVES_H

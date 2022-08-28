@@ -1,5 +1,6 @@
 #include "Camera.h"
 #include <Logger.h>
+#include <algorithm>
 #include <cmath>
 #include <numbers>
 
@@ -11,7 +12,6 @@ int sgn(T val) {
 }
 
 static float maxRotateRadPerSec = std::numbers::pi_v<float>;
-static float epsilon = 0.001f;
 
 const Eigen::Matrix4f& Camera::GetLookAt() const {
     // Right Hand Coordinate System
@@ -56,27 +56,26 @@ void Camera::UpdateOrientation(const Eigen::AngleAxisf& angleAxis) {
 }
 
 void Camera::UpdateCameraPosition(Eigen::Vector2d deltaCursorPos, double delta_time) {
-    static const float sensitivity = 1.5f;
+    static const float sensitivity = 3.f;
 
-    const float maxRotRadPerTimeInstance = delta_time * maxRotateRadPerSec * sensitivity;
-    const float rad_y = std::atan2(_eye.y(), _eye.x());
-    if (deltaCursorPos.y() != 0.f && (rad_y < std::numbers::pi_v<float> || rad_y > -std::numbers::pi_v<float>)) {
+    const float maxRotRadPerTimeInstance = delta_time * maxRotateRadPerSec;
+    if (deltaCursorPos.y() != 0.) {
+        const float maxRotRadPerTimeInstanceSensitive = maxRotRadPerTimeInstance * 1.5f;
+        const float len = std::sqrt(std::pow(_eye.x(), 2.f) + std::pow(_eye.z(), 2.f));
+        const float sign = sgn(-deltaCursorPos.y());
+        const float maxRadY = 1.55f;
+        const float rad_y = -1.f * std::atan2(_eye.y(), len);
+        const float rotMax = (std::abs(rad_y + sign * maxRotRadPerTimeInstanceSensitive) > maxRadY ? (maxRadY - std::abs(rad_y)) : maxRotRadPerTimeInstanceSensitive);
         const Eigen::Vector3f camDir = (_eye - _target).normalized();
         const Eigen::Vector3f camRight = (_up.cross(camDir)).normalized();
-        const float sign = sgn(deltaCursorPos.y());
-        float maxRotRad = 0.f;
-        if (sign > 0.f) {
-            maxRotRad = -std::numbers::pi_v<float> + maxRotRadPerTimeInstance < rad_y ? -maxRotRadPerTimeInstance : -std::numbers::pi_v<float> - rad_y + epsilon;
-        } else {
-            maxRotRad = std::numbers::pi_v<float> - maxRotRadPerTimeInstance > rad_y ? maxRotRadPerTimeInstance : std::numbers::pi_v<float> - rad_y - epsilon;
-        }
 
-        Eigen::Affine3f rot_pitch(Eigen::AngleAxis<float>(maxRotRad, camRight));
+        const Eigen::Affine3f rot_pitch(Eigen::AngleAxis<float>(sign * rotMax, camRight));
         _eye = rot_pitch * _eye;
     }
 
-    if (deltaCursorPos.x() != 0) {
-        Eigen::Affine3f rot_yaw(Eigen::AngleAxis<float>(maxRotRadPerTimeInstance * -sgn(deltaCursorPos.x()), Eigen::Vector3f::UnitY()));
+    if (deltaCursorPos.x() != 0.) {
+        const float sign = sgn(-deltaCursorPos.x());
+        const Eigen::Affine3f rot_yaw(Eigen::AngleAxis<float>(sensitivity * sign * maxRotRadPerTimeInstance, Eigen::Vector3f::UnitY()));
         _eye = rot_yaw * _eye;
     }
 }

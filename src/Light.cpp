@@ -18,6 +18,6 @@ Light::Light(std::string name,
 void Light::Render() {
 }
 Shader* Light::AddShader(std::unique_ptr<Shader> spShader) {
-   _spShader = std::move(spShader);
-   return _spShader.get();
+    _spShader = std::move(spShader);
+    return _spShader.get();
 }

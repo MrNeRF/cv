@@ -16,9 +16,9 @@ class Light : public IRenderable {
     virtual ~Light() = default;
     virtual Shader* AddShader(std::unique_ptr<Shader> spShader) override;
     void Render() override;
-    const std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() const override {return _renderUnits;};
-    std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() override {return _renderUnits;};
-    const std::string& GetName() const override {return _name;};
+    const std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() const override { return _renderUnits; };
+    std::vector<std::unique_ptr<RenderUnit>>& GetRenderUnits() override { return _renderUnits; };
+    const std::string& GetName() const override { return _name; };
     [[nodiscard]] const Eigen::Vector3f& GetAmbient() const { return _ambient; }
     [[nodiscard]] const Eigen::Vector3f& GetDiffuse() const { return _diffuse; }
     [[nodiscard]] const Eigen::Vector3f& GetSpecular() const { return _specular; }

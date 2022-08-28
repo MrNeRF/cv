@@ -136,6 +136,7 @@ namespace collision {
             createBoundingSphere(rMeshToBV);
             break;
         case Primitives::Types::Cuboid:
+        case Primitives::Types::Plane:
             createBoundingCuboid(rMeshToBV);
             break;
         }
@@ -178,6 +179,9 @@ namespace collision {
         case Primitives::Types::Cuboid:
             bHasCollison = HasCollision(dynamic_cast<const Cuboid&>(*_spBoundingVolume), rRay);
             break;
+        case Primitives::Types::Plane:
+            bHasCollison = false;
+            break;
         }
 
         return bHasCollison;
@@ -194,6 +198,9 @@ namespace collision {
             case Primitives::Types::Cuboid:
                 bHasCollison = HasCollision(dynamic_cast<const Sphere&>(*_spBoundingVolume), dynamic_cast<const Cuboid&>(*rBV.GetBoundingVolume()));
                 break;
+            case Primitives::Types::Plane:
+                bHasCollison = false;
+                break;
             }
         } break;
         case Primitives::Types::Cuboid: {
@@ -204,7 +211,13 @@ namespace collision {
             case Primitives::Types::Cuboid:
                 bHasCollison = HasCollision(dynamic_cast<const Cuboid&>(*_spBoundingVolume), dynamic_cast<const Cuboid&>(*rBV.GetBoundingVolume()));
                 break;
+            case Primitives::Types::Plane:
+                bHasCollison = false;
             }
+            break;
+        }
+        case Primitives::Types::Plane: {
+            bHasCollison = false;
         } break;
         }
         return bHasCollison;
@@ -218,35 +231,35 @@ namespace collision {
             return false;
         }
 
-        for (size_t idx = 0; idx < rMesh.vertices.size(); idx += 3) {
-            Eigen::Vector3f vec0 = rMesh.vertices[idx].position;
-            Eigen::Vector3f vec1 = rMesh.vertices[idx + 1].position;
-            Eigen::Vector3f vec2 = rMesh.vertices[idx + 2].position;
-            vec0 = model * vec0 + position;
-            vec1 = model * vec1 + position;
-            vec2 = model * vec2 + position;
-            Eigen::Vector3f vecA = vec1 - vec0;
-            Eigen::Vector3f vecB = vec2 - vec0;
-            Eigen::Vector3f pVec = rRay._direction.cross(vecB);
-            float det = vecA.dot(pVec);
-            if (std::abs(det) < std::numeric_limits<float>::epsilon()) {
-                continue;
-            }
-            const float invDet = 1.f / det;
-            Eigen::Vector3f tvec = rRay._origin - vec0;
-            const float u = tvec.dot(pVec) * invDet;
-            if (u < 0.f || u > 1.f) {
-                continue;
-            }
-
-            const Eigen::Vector3f qvec = tvec.cross(vecA);
-            const float v = rRay._direction.dot(qvec) * invDet;
-            if ((v < 0) || u + v > 1.f) {
-                continue;
-            }
-            std::cout << "Object hit" << std::endl;
-            return true;
-        }
+        //        for (size_t idx = 0; idx < rMesh.vertices.size(); idx += 3) {
+        //            Eigen::Vector3f vec0 = rMesh.vertices[idx].position;
+        //            Eigen::Vector3f vec1 = rMesh.vertices[idx + 1].position;
+        //            Eigen::Vector3f vec2 = rMesh.vertices[idx + 2].position;
+        //            vec0 = model * vec0 + position;
+        //            vec1 = model * vec1 + position;
+        //            vec2 = model * vec2 + position;
+        //            Eigen::Vector3f vecA = vec1 - vec0;
+        //            Eigen::Vector3f vecB = vec2 - vec0;
+        //            Eigen::Vector3f pVec = rRay._direction.cross(vecB);
+        //            float det = vecA.dot(pVec);
+        //            if (std::abs(det) < std::numeric_limits<float>::epsilon()) {
+        //                continue;
+        //            }
+        //            const float invDet = 1.f / det;
+        //            Eigen::Vector3f tvec = rRay._origin - vec0;
+        //            const float u = tvec.dot(pVec) * invDet;
+        //            if (u < 0.f || u > 1.f) {
+        //                continue;
+        //            }
+        //
+        //            const Eigen::Vector3f qvec = tvec.cross(vecA);
+        //            const float v = rRay._direction.dot(qvec) * invDet;
+        //            if ((v < 0) || u + v > 1.f) {
+        //                continue;
+        //            }
+        //            std::cout << "Object hit" << std::endl;
+        //            return true;
+        //        }
         return false;
     }
 
