@@ -30,7 +30,7 @@ int Viewer3D::Init(void) {
     pParentNode = _spSceneGraph->InserNode(nullptr, std::move(spNode));
 
     _spCamera = std::make_shared<Camera>();
-    _spCamera->SetPerspectiveProjection(45.f, _spWindow->GetAspectRatio(), 0.1, 50.f);
+    _spCamera->SetPerspectiveProjection(45.f, _spWindow->GetAspectRatio(), 0.01, 100.f);
     _spWindow->RegisterObserver(_spCamera, InputEvent::InputEventType::MouseWheel);
     _spWindow->RegisterObserver(_spCamera, InputEvent::InputEventType::MouseButton);
     _spWindow->RegisterObserver(_spCamera, InputEvent::InputEventType::WindowResize);
@@ -41,21 +41,13 @@ int Viewer3D::Init(void) {
 void Viewer3D::Run(void) {
     auto& rLogger = Logger::GetInstance().GetLogger();
     rLogger.info("Viewer3D::Run()");
-
     {
         auto spModel = Importer::ImportModel("racecar.obj");
-        //        auto spModel = Importer::ImportModel("dice.obj");
-
-        //        Eigen::Matrix3f scale;
-        //        scale(0, 0) = 5.f;
-        //        scale(1, 1) = 5.f;
-        //        scale(2, 2) = 5.f;
-        //        dynamic_cast<Model*>(spModel.get())->Transform(scale);
         auto& renderUnits = spModel->GetRenderUnits();
         const Eigen::Affine3f rotation(Eigen::AngleAxis<float>(-std::numbers::pi_v<float> * 0.5f, Eigen::Vector3f::UnitX()));
         auto pModel = dynamic_cast<Model*>(spModel.get());
         pModel->Transform(rotation.rotation());
-        pModel->SetPosition(Eigen::Vector4f(0.f, 1.f, 0.f, 1.f));
+        pModel->SetPosition(Eigen::Vector4f(0.f, .0f, 0.f, 1.f));
         for (auto& renderUnit : renderUnits) {
             auto spPhongShader = std::make_unique<PhongShader>();
             spPhongShader->SetLightSource(dynamic_cast<Light*>(_spSceneGraph->GetNode("Light")->renderable.get()));
@@ -101,12 +93,12 @@ void Viewer3D::Run(void) {
         auto spRenderUnit = std::make_unique<RenderUnit>();
         spRenderUnit->spMesh = algorithm::PrimitiveToMesh(Plane(2.f, 2.f));
         spModel->AddRenderUnit(std::move(spRenderUnit));
-        auto pModel = dynamic_cast<Model*>(spModel.get());
         const Eigen::Affine3f rotation(Eigen::AngleAxis<float>(-std::numbers::pi_v<float> * 0.5f, Eigen::Vector3f::UnitX()));
-        pModel->Transform(rotation.rotation());
+        Eigen::Matrix4f rot = Eigen::Matrix4f::Zero();
+        rot.block(0, 0, 3, 3) = rotation.rotation();
+        rot(3,3) = 1.f;
         auto& renderUnits = spModel->GetRenderUnits();
         for (auto& renderUnit : renderUnits) {
-            //            auto spShader = std::make_unique<ColorShader>(Eigen::Vector4f(1.f, 1.f, 1.f, 1.f));
             auto spShader = std::make_unique<GridFloorShader>();
             spShader->SetCamera(_spCamera);
             spShader->SetName("GridShader");
@@ -119,7 +111,7 @@ void Viewer3D::Run(void) {
         _renderer.AddRenderable(spModel.get());
         _renderObjects.push_back(std::move(spModel));
     }
-    CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));
+
     render();
 }
 
@@ -132,7 +124,11 @@ void Viewer3D::render() {
                                  _backgroundColor.z() * _backgroundColor.w(),
                                  _backgroundColor.w()));
 
+    CHECK_GL_ERROR_(glEnable(GL_DEPTH_TEST));
     CHECK_GL_ERROR_(glDepthFunc(GL_LESS))
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     while (!glfwWindowShouldClose(_spWindow->GetGLFWWindow())) {
         auto t1 = std::chrono::high_resolution_clock::now();
@@ -151,7 +147,7 @@ void Viewer3D::render() {
         _renderer.Render();
         glfwSwapBuffers(_spWindow->GetGLFWWindow());
 
-        glfwPollEvents();  // should be invoked ater glfwSwapBuffers
+        glfwPollEvents();  // should be invoked after glfwSwapBuffers
         auto t2 = std::chrono::high_resolution_clock::now();
         auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
         fps = static_cast<uint32_t>(1000L / std::max(time_elapsed, 1L));

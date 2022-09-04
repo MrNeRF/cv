@@ -12,7 +12,7 @@
 
 int ImageViewer::Init(void) {
     _spCamera = std::make_shared<Camera>();
-    _spCamera->SetPerspectiveProjection(45.f, _spWindow->GetAspectRatio(), 0.1, 50.f);
+    _spCamera->SetPerspectiveProjection(45.f, _spWindow->GetAspectRatio(), 0.01, 100.f);
     _spWindow->Init();
 
     auto spCanvasShader = std::make_unique<CanvasShader>();

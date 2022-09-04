@@ -168,16 +168,16 @@ namespace algorithm {
     }
 
     std::unique_ptr<Mesh> CreatePlaneMesh(const Plane& rPlane) {
-        const float w = rPlane.GetWidth() * 0.5f;
-        const float d = rPlane.GetDepth() * 0.5f;
+//        const float w = rPlane.GetWidth() * 0.5f;
+//        const float d = rPlane.GetDepth() * 0.5f;
         std::vector<Eigen::Vector3f> vertices;
         vertices.reserve(4);
-        vertices.emplace_back(Eigen::Vector3f(-w, 0.f, -d));  // 0
-        vertices.emplace_back(Eigen::Vector3f(-w, 0.f, d));   // 1
-        vertices.emplace_back(Eigen::Vector3f(w, 0.f, d));    // 2
-        vertices.emplace_back(Eigen::Vector3f(w, 0.f, -d));   // 3
+        vertices.emplace_back(Eigen::Vector3f(1.f, 1.f, 0.f));  // 0
+        vertices.emplace_back(Eigen::Vector3f(-1.f, -1.f, 0.f));   // 1
+        vertices.emplace_back(Eigen::Vector3f(-1.f, 1.f, 0.f));    // 2
+        vertices.emplace_back(Eigen::Vector3f(1.f, -1.f, 0.f));   // 3
 
-        std::vector<uint32_t> indices{0, 1, 2, 0, 2, 3};
+        std::vector<uint32_t> indices{0, 1, 2, 1, 0, 3};
         Eigen::Vector3f normal(0.f, 1.f, 0.f);
 
         auto spMesh = std::make_unique<Mesh>();

@@ -29,10 +29,10 @@ class Camera : public IObserver {
 
    private:
     float _fov = 45.f;
-    float _zNear = 1.f;
-    float _zFar = 50.f;
+    float _zNear = .01f;
+    float _zFar = 100.f;
     float _aspectRatio = 0.75f;
-    Eigen::Vector3f _eye = Eigen::Vector3f(0.f, 3.f, 12.f);
+    Eigen::Vector3f _eye = Eigen::Vector3f(0.f, 1.f, 8.f);
     Eigen::Vector3f _target = Eigen::Vector3f(0.f, 0.f, 0.f);
     Eigen::Vector3f _up = Eigen::Vector3f(0.f, 1.f, 0.f);
     Eigen::Matrix4f _frustum;

@@ -43,7 +43,7 @@ void main()
 	float spec = pow(max(dot(viewDir, reflectDir), 0.f), material.specularExponent);
 	vec3 specular = light.specular * (spec * material.specular);
 
-//	vec3 result = texture(inputTexture, uv).xyz;
 	vec3 result = (ambient + diffuse + specular) * texture(inputTexture, uv).xyz;
+//	gl_FragDepth = gl_FragCoord.z * 0.998;
     FragColor = vec4(result, 1.f) ;
 } 

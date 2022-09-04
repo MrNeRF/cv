@@ -11,7 +11,7 @@ int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-static float maxRotateRadPerSec = std::numbers::pi_v<float>;
+static float maxRotateRadPerSec = std::numbers::pi_v<float> / 180.0;
 
 const Eigen::Matrix4f& Camera::GetLookAt() const {
     // Right Hand Coordinate System
@@ -19,6 +19,7 @@ const Eigen::Matrix4f& Camera::GetLookAt() const {
     Eigen::Vector3f camRight = (_up.cross(camDir)).normalized();
     Eigen::Vector3f camUp = camDir.cross(camRight);
 
+    _view  = Eigen::Matrix4f::Zero();
     _view.block(0, 0, 1, 3) = camRight.transpose();
     _view.block(1, 0, 1, 3) = camUp.transpose();
     _view.block(2, 0, 1, 3) = camDir.transpose();
@@ -33,7 +34,7 @@ const Eigen::Matrix4f& Camera::GetLookAt() const {
 void Camera::SetPerspectiveProjection(float fov, float aspectRatio, float zNearPlane, float zFarPlane) {
     _zFar = zFarPlane;
     _zNear = zNearPlane;
-    _fov = fov;
+    _fov = fov * std::numbers::pi_v<float> / 180.f;
     _aspectRatio = aspectRatio;
 
     float height = _zNear * tanf(_fov * .5f);
@@ -56,11 +57,11 @@ void Camera::UpdateOrientation(const Eigen::AngleAxisf& angleAxis) {
 }
 
 void Camera::UpdateCameraPosition(Eigen::Vector2d deltaCursorPos, double delta_time) {
-    static const float sensitivity = 3.f;
 
-    const float maxRotRadPerTimeInstance = delta_time * maxRotateRadPerSec;
     if (deltaCursorPos.y() != 0.) {
-        const float maxRotRadPerTimeInstanceSensitive = maxRotRadPerTimeInstance * 1.5f;
+        const float maxRotRadPerTimeInstance = maxRotateRadPerSec * std::abs(deltaCursorPos.y());
+        static const float sensitivityY = 0.5;
+        const float maxRotRadPerTimeInstanceSensitive = maxRotRadPerTimeInstance * sensitivityY;
         const float len = std::sqrt(std::pow(_eye.x(), 2.f) + std::pow(_eye.z(), 2.f));
         const float sign = sgn(-deltaCursorPos.y());
         const float maxRadY = 1.55f;
@@ -74,8 +75,10 @@ void Camera::UpdateCameraPosition(Eigen::Vector2d deltaCursorPos, double delta_t
     }
 
     if (deltaCursorPos.x() != 0.) {
+        const float maxRotRadPerTimeInstance = maxRotateRadPerSec * std::abs(deltaCursorPos.x());
+        static const float sensitivityX = 1.f;
         const float sign = sgn(-deltaCursorPos.x());
-        const Eigen::Affine3f rot_yaw(Eigen::AngleAxis<float>(sensitivity * sign * maxRotRadPerTimeInstance, Eigen::Vector3f::UnitY()));
+        const Eigen::Affine3f rot_yaw(Eigen::AngleAxis<float>(sensitivityX * sign * maxRotRadPerTimeInstance, Eigen::Vector3f::UnitY()));
         _eye = rot_yaw * _eye;
     }
 }
@@ -95,9 +98,9 @@ void Camera::Update(const InputEvent::IEvent& rEvent) {
     } break;
     case InputEvent::InputEventType::MouseWheel: {
         const auto& event = dynamic_cast<const InputEvent::MouseWheel&>(rEvent);
-        _fov -= static_cast<float>(event.yOffeset) * .05f;
-        std::cout << _fov << "\n";
-        SetPerspectiveProjection(_fov, _aspectRatio, _zNear, _zFar);
+        float fov = _fov *  180.f / std::numbers::pi_v<float>;
+        fov -= static_cast<float>(event.yOffeset * 2.5) ;
+        SetPerspectiveProjection(fov, _aspectRatio, _zNear, _zFar);
     } break;
     case InputEvent::InputEventType::WindowResize: {
         const auto& event = dynamic_cast<const InputEvent::WindowResize&>(rEvent);
@@ -108,15 +111,13 @@ void Camera::Update(const InputEvent::IEvent& rEvent) {
     }
 }
 
-Eigen::Matrix4f ComputeFrustum(float left, float right, float bottom, float top, float near, float far) {
+Eigen::Matrix4f ComputeFrustum(float left, float right, float bottom, float top, float zNear, float zFar) {
     Eigen::Matrix4f projection = Eigen::Matrix4f::Zero(4, 4);
 
-    projection(0, 0) = 2.f * near / (right - left);
-    projection(0, 2) = (right + left) / (right - left);
-    projection(1, 1) = 2.f * near / (top - bottom);
-    projection(1, 2) = (top + bottom) / (top - bottom);
-    projection(2, 2) = -(far + near) / (far - near);
-    projection(2, 3) = -(2.f * far * near) / (far - near);
+    projection(0, 0) = zNear / right;
+    projection(1, 1) = zNear / top;
+    projection(2, 2) = -(zFar + zNear) / (zFar - zNear);
+    projection(2, 3) = (-2.f * zFar * zNear) / (zFar - zNear);
     projection(3, 2) = -1.f;
 
     return projection;
